@@ -1,0 +1,44 @@
+{
+  "name": "fsatify-api",
+  "version": "1.0.0",
+  "main": "src/server.ts",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "jest --runInBand",
+    "start": "ts-node src/server.ts",
+    "dev": "tsnd --respawn --transpile-only --exit-child src/server.ts",
+    "migrate:dev": "export $(grep -v '^#' .env | xargs) && DATABASE_URL=\"$DATABASE_URL\" prisma migrate dev && DATABASE_URL=\"$DATABASE_URL_TEST\" prisma migrate dev"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fastify/autoload": "^5.0.0",
+    "@fastify/env": "^4.2.0",
+    "@fastify/jwt": "^6.5.0",
+    "@fastify/redis": "^6.1.0",
+    "@fastify/sensible": "^5.0.0",
+    "@fastify/swagger": "^8.3.1",
+    "@fastify/swagger-ui": "^1.3.0",
+    "@prisma/client": "^4.9.0",
+    "@types/bcrypt": "^5.0.0",
+    "bcrypt": "^5.1.0",
+    "fastify": "^4.0.0",
+    "fastify-cli": "^5.7.1",
+    "fastify-plugin": "^4.0.0",
+    "fastify-zod": "^1.2.0",
+    "ts-node": "^10.9.1",
+    "zod": "^3.20.2"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.4.0",
+    "@types/node": "^18.11.18",
+    "jest": "^27.4.7",
+    "prisma": "^4.9.0",
+    "ts-jest": "^27.1.3",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^4.9.4"
+  }
+}

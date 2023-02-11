@@ -1,0 +1,8 @@
+/node_modules
+/.github
+.idea
+.editorconfig
+.env.example
+.gitattributes
+.gitignore
+README.md

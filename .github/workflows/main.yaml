@@ -1,0 +1,40 @@
+name: Test
+
+on: [pull_request]
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+        env:
+            HOST: 127.0.0.1
+            DATABASE_URL: "mysql://root:password@localhost:3306/db"
+            DATABASE_URL_TEST: "mysql://root:password@localhost:3306/db"
+            REDIS_HOST: "localhost"
+            REDIS_PASSWORD: ""
+            SECRET: "7ZB68E3HZ9HWGe8FzUvNWZcoYD9uuwkp25Y66S6RkszKadFMJCj9ShXL7TBcieG9yoRAsdTKzJcEgQUYbd6dtjXgmZMQhVNKypNeq6yKKLVht7gUtXypaoxgoRjQDHLceCWmJhM6GbwYiyLHmVYA8L9zuJUhYW2atZiv4Fxoc4YqzaCCrSZxzPBT9rFDSCtHsXXDEShMvULSStZvwt26tesWtxEMx5Q43a3s6eHrPJUPgVX3aAZsmYRu3bzCHvRp"
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Setup MariaDB server
+              uses: getong/mariadb-action@v1.1
+              with:
+                  mysql database: "db"
+                  mysql root password: "password"
+
+            - name: Setup Redis server
+              uses: supercharge/redis-github-action@1.4.0
+
+            - name: Install node
+              uses: actions/setup-node@v2
+              with:
+                  node-version: "19"
+                  cache: "npm"
+
+            - name: Install npm modules
+              run: npm install
+
+            - name: Run prisma migrations & generate prisma client
+              run: npx prisma migrate dev
+
+            - name: Run tests
+              run: npm run test
