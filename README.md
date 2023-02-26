@@ -1,4 +1,5 @@
 ## API documentation (Swagger)
+
 Open [http://localhost:3000/api/docs](http://localhost:3000/api/docs) to view it in the browser.
 
 ## Available Scripts
@@ -10,9 +11,17 @@ In the project directory, you can run:
 To start the app in dev mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-### `npm start`
+### `npm run build`
 
-For production mode
+Builds production
+
+### `npm run start`
+
+Run production
+
+### `npm run dev`
+
+Run development
 
 ### `npm run test`
 

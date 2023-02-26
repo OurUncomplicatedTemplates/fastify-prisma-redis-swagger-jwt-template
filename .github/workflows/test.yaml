@@ -1,14 +1,14 @@
-name: Test
+name: test
 
-on: [pull_request]
+on: [push]
 
 jobs:
     test:
         runs-on: ubuntu-latest
         env:
             HOST: 127.0.0.1
-            DATABASE_URL: "mysql://root:password@localhost:3306/db"
-            DATABASE_URL_TEST: "mysql://root:password@localhost:3306/db"
+            DATABASE_URL: "mysql://root:password@localhost:3306/overnites"
+            DATABASE_URL_TEST: "mysql://root:password@localhost:3306/overnites"
             REDIS_HOST: "localhost"
             REDIS_PASSWORD: ""
             SECRET: "7ZB68E3HZ9HWGe8FzUvNWZcoYD9uuwkp25Y66S6RkszKadFMJCj9ShXL7TBcieG9yoRAsdTKzJcEgQUYbd6dtjXgmZMQhVNKypNeq6yKKLVht7gUtXypaoxgoRjQDHLceCWmJhM6GbwYiyLHmVYA8L9zuJUhYW2atZiv4Fxoc4YqzaCCrSZxzPBT9rFDSCtHsXXDEShMvULSStZvwt26tesWtxEMx5Q43a3s6eHrPJUPgVX3aAZsmYRu3bzCHvRp"
@@ -18,7 +18,7 @@ jobs:
             - name: Setup MariaDB server
               uses: getong/mariadb-action@v1.1
               with:
-                  mysql database: "db"
+                  mysql database: "overnites"
                   mysql root password: "password"
 
             - name: Setup Redis server

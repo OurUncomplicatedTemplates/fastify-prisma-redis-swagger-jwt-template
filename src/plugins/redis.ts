@@ -15,6 +15,12 @@ declare module "ioredis" {
             ttl: number,
             callback: () => string | Promise<string>
         ): Promise<string>;
+        rememberJSON<T>(
+            key: string,
+            ttl: number,
+            callback: () => T | Promise<void | T>
+        ): Promise<T>;
+        invalidateCaches(...keys: string[]): Promise<void>;
     }
 }
 
@@ -37,6 +43,22 @@ export default fastifyPlugin(
             await fastify.redis.setex(key, ttl, value);
 
             return value;
+        };
+
+        fastify.redis.rememberJSON = async (key, ttl, callback) => {
+            return JSON.parse(
+                await fastify.redis.remember(key, ttl, async () => {
+                    return JSON.stringify(await callback());
+                })
+            );
+        };
+
+        fastify.redis.invalidateCaches = async (...keys) => {
+            await Promise.all(
+                keys.map(async (key) => {
+                    await fastify.redis.del(key);
+                })
+            );
         };
 
         fastify.addHook("preHandler", (req, reply, next) => {

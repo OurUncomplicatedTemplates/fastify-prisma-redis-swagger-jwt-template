@@ -1,0 +1,13 @@
+{
+    "recommendations": [
+        "Orta.vscode-jest",
+        "mikestead.dotenv",
+        "dbaeumer.vscode-eslint",
+        "ms-azuretools.vscode-docker",
+        "bierner.markdown-preview-github-styles",
+        "christian-kohler.npm-intellisense",
+        "christian-kohler.path-intellisense",
+        "esbenp.prettier-vscode",
+        "Tyriar.sort-lines"
+    ]
+}

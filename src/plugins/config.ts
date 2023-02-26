@@ -3,6 +3,21 @@ import { FastifyInstance, FastifyPluginOptions } from "fastify";
 import fastifyEnv from "@fastify/env";
 import fastifyPlugin from "fastify-plugin";
 
+declare module "fastify" {
+    interface FastifyInstance {
+        config: {
+            NODE_ENV: string;
+            SECRET: string;
+            HOST: string;
+            PORT: number;
+            DATABASE_URL: string;
+            DATABASE_URL_TEST: string;
+            REDIS_HOST: string;
+            REDIS_PASSWORD: string;
+        };
+    }
+}
+
 async function configPlugin(
     server: FastifyInstance,
     options: FastifyPluginOptions,
@@ -69,18 +84,3 @@ async function configPlugin(
 }
 
 export default fastifyPlugin(configPlugin, { name: "config" });
-
-declare module "fastify" {
-    interface FastifyInstance {
-        config: {
-            NODE_ENV: string;
-            SECRET: string;
-            HOST: string;
-            PORT: number;
-            DATABASE_URL: string;
-            DATABASE_URL_TEST: string;
-            REDIS_HOST: string;
-            REDIS_PASSWORD: string;
-        };
-    }
-}
