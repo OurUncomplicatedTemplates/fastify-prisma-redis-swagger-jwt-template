@@ -3,11 +3,12 @@ import {
     createAccessToken,
     createRefreshToken,
     createUser,
-    findUserByEmail,
-    findUserById,
+    getUserByEmail,
+    getUserById,
 } from "./auth.service";
 import { CreateUserInput, LoginInput } from "./auth.schema";
 import { compareSync } from "bcrypt";
+import { errorMessage } from "../../utils/string";
 
 export async function registerUserHandler(
     request: FastifyRequest<{
@@ -18,15 +19,9 @@ export async function registerUserHandler(
     try {
         const user = await createUser(request.body);
 
-        reply.code(201).send(user);
+        return reply.code(201).send(user);
     } catch (e) {
-        let message = String(e);
-
-        if (e instanceof Error) {
-            message = e.message;
-        }
-
-        return reply.badRequest(message);
+        return reply.badRequest(errorMessage(e));
     }
 }
 
@@ -36,13 +31,13 @@ export async function loginHandler(
     }>,
     reply: FastifyReply
 ) {
-    const user = await findUserByEmail(request.body.email);
+    const user = await getUserByEmail(request.body.email);
 
     if (!user || !compareSync(request.body.password, user.password)) {
         return reply.unauthorized("email and/or password incorrect");
     }
 
-    reply
+    return reply
         .code(200)
         .setCookie("refreshToken", createRefreshToken(user, request.jwt), {
             path: "/api/auth/refresh",
@@ -66,13 +61,13 @@ export async function refreshHandler(
             exp: number;
         }>({ onlyCookie: true });
 
-        const user = await findUserById(refrestTokenPayload.sub);
+        const user = await getUserById(refrestTokenPayload.sub);
 
         if (!user) {
             return reply.unauthorized();
         }
 
-        reply
+        return reply
             .code(200)
             .setCookie("refreshToken", createRefreshToken(user, request.jwt), {
                 path: "/api/auth/refresh",
@@ -84,7 +79,7 @@ export async function refreshHandler(
                 accessToken: createAccessToken(user, request.jwt),
             });
     } catch (err) {
-        reply.unauthorized();
+        return reply.unauthorized();
     }
 }
 
@@ -92,7 +87,7 @@ export async function logoutHandler(
     request: FastifyRequest,
     reply: FastifyReply
 ) {
-    reply
+    return reply
         .code(200)
         .clearCookie("refreshToken", {
             path: "/api/auth/refresh",
@@ -107,10 +102,10 @@ export async function userHandler(
     request: FastifyRequest,
     reply: FastifyReply
 ) {
-    const user = await findUserById(request.user.sub);
+    const user = await getUserById(request.user.sub);
     if (!user) {
         return reply.unauthorized();
     }
 
-    reply.code(200).send(user);
+    return reply.code(200).send(user);
 }

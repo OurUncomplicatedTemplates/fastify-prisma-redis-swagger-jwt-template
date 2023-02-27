@@ -5,28 +5,26 @@ import { prisma } from "../../plugins/prisma";
 import { CreateUserInput } from "./auth.schema";
 
 export async function createUser(input: CreateUserInput) {
-    if (await findUserByEmail(input.email)) {
+    if (await getUserByEmail(input.email)) {
         throw Error("Email is already in use");
     }
 
-    const user = await prisma.user.create({
+    return await prisma.user.create({
         data: {
             email: input.email,
             password: hashSync(input.password, 10),
             name: input.name,
         },
     });
-
-    return user;
 }
 
-export async function findUserByEmail(email: string) {
+export async function getUserByEmail(email: string) {
     return await prisma.user.findFirst({
         where: { email: email },
     });
 }
 
-export async function findUserById(id: number) {
+export async function getUserById(id: number) {
     return await prisma.user.findFirst({
         where: { id: id },
     });
