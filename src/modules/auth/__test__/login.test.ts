@@ -1,13 +1,14 @@
 import { FastifyInstance } from "fastify";
-import { build } from "../../../index";
 import { hashSync } from "bcrypt";
-import { prisma } from "../../../plugins/prisma";
+import { PrismaClient } from "@prisma/client";
 
 describe("POST /api/auth/login", () => {
     let fastify: FastifyInstance;
+    let prisma: PrismaClient;
 
     beforeAll(async () => {
-        fastify = await build();
+        fastify = global.fastify;
+        prisma = global.prisma;
 
         await prisma.user.deleteMany();
         await prisma.user.create({
@@ -17,10 +18,6 @@ describe("POST /api/auth/login", () => {
                 password: hashSync("1234", 10),
             },
         });
-    });
-
-    afterAll(async () => {
-        await fastify.close();
     });
 
     it("should return status 200, set a refreshToken and return a new accessToken", async () => {

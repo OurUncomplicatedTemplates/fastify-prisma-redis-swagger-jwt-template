@@ -1,15 +1,10 @@
 import { FastifyInstance } from "fastify";
-import { build } from "../index";
 
 describe("remember()", () => {
     let fastify: FastifyInstance;
 
     beforeAll(async () => {
-        fastify = await build();
-    });
-
-    afterAll(async () => {
-        await fastify.close();
+        fastify = global.fastify;
     });
 
     it("should return callback value, if not cached", async () => {
@@ -127,9 +122,6 @@ describe("remember()", () => {
     });
 
     it("should invalidate all caches set new", async () => {
-        await fastify.redis.del("key");
-        await fastify.redis.del("key2");
-
         await fastify.redis.set("key", "Cached Value");
         await fastify.redis.set(
             "key2",

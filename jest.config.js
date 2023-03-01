@@ -5,4 +5,6 @@ module.exports = {
     transform: {
         "^.+\\.(t|j)sx?$": "@swc/jest",
     },
+    globalSetup: "./src/test/globalSetupHook.js",
+    globalTeardown: "./src/test/globalTestTeardown.ts",
 };

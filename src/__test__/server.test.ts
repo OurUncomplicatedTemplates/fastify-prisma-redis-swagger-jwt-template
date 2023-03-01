@@ -1,15 +1,10 @@
 import { FastifyInstance } from "fastify";
-import { build } from "../index";
 
 describe("GET /api/health", () => {
     let fastify: FastifyInstance;
 
     beforeAll(async () => {
-        fastify = await build();
-    });
-
-    afterAll(async () => {
-        await fastify.close();
+        fastify = global.fastify;
     });
 
     it("should return status 200", async () => {

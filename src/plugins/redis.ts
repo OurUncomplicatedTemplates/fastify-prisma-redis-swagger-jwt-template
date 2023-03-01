@@ -54,11 +54,7 @@ export default fastifyPlugin(
         };
 
         fastify.redis.invalidateCaches = async (...keys) => {
-            await Promise.all(
-                keys.map(async (key) => {
-                    await fastify.redis.del(key);
-                })
-            );
+            await fastify.redis.del(keys);
         };
 
         fastify.addHook("preHandler", (req, reply, next) => {
