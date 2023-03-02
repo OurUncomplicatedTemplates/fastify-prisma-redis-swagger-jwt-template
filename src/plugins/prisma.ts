@@ -2,7 +2,7 @@ import fastifyPlugin from "fastify-plugin";
 import { FastifyInstance, FastifyPluginOptions } from "fastify";
 import { PrismaClient } from "@prisma/client";
 
-export let prisma: PrismaClient;
+export let prisma: PrismaClient = global.prisma;
 
 export default fastifyPlugin(
     async (fastify: FastifyInstance, options: FastifyPluginOptions) => {

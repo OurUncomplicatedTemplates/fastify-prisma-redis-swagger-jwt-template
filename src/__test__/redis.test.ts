@@ -1,11 +1,5 @@
-import { FastifyInstance } from "fastify";
-
 describe("remember()", () => {
-    let fastify: FastifyInstance;
-
-    beforeAll(async () => {
-        fastify = global.fastify;
-    });
+    const fastify = global.fastify;
 
     it("should return callback value, if not cached", async () => {
         await fastify.redis.del("key");
