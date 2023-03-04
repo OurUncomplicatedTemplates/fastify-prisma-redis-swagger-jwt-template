@@ -3,8 +3,13 @@ module.exports = {
     preset: "ts-jest",
     testEnvironment: "node",
     transform: {
-        "^.+\\.(t|j)sx?$": "@swc/jest",
+        "^.+\\.(t|j)sx?$": ["@swc/jest"],
     },
-    globalSetup: "./src/test/globalSetupHook.js",
-    globalTeardown: "./src/test/globalTestTeardown.ts",
+    setupFilesAfterEnv: ["./src/test/setupTest.ts"],
+    collectCoverageFrom: [
+        "./src/modules/**",
+        "./src/plugins/**",
+        "!./src/plugins/swagger.ts",
+    ],
+    coveragePathIgnorePatterns: ["node_modules"],
 };

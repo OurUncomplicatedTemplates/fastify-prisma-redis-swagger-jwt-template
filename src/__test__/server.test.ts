@@ -1,8 +1,6 @@
 describe("GET /api/health", () => {
-    const fastify = global.fastify;
-
     it("should return status 200", async () => {
-        const response = await fastify.inject({
+        const response = await global.fastify.inject({
             method: "GET",
             url: "/api/health",
         });

@@ -10,6 +10,10 @@ import { FastifyInstance, FastifyPluginOptions } from "fastify";
  */
 export default fastifyPlugin(
     async (fastify: FastifyInstance, opts: FastifyPluginOptions) => {
+        if (fastify.config.NODE_ENV === "test") {
+            return;
+        }
+
         await fastify.register(fastifySwagger, {
             mode: "dynamic",
             openapi: {
@@ -29,5 +33,6 @@ export default fastifyPlugin(
             },
             staticCSP: true,
         });
-    }
+    },
+    { dependencies: ["config"] }
 );

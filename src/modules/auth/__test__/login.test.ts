@@ -2,8 +2,6 @@ import { prisma } from "../../../plugins/prisma";
 import { hashSync } from "bcrypt";
 
 describe("POST /api/auth/login", () => {
-    const fastify = global.fastify;
-
     beforeAll(async () => {
         await prisma.user.deleteMany();
         await prisma.user.create({
@@ -16,7 +14,7 @@ describe("POST /api/auth/login", () => {
     });
 
     it("should return status 200, set a refreshToken and return a new accessToken", async () => {
-        const response = await fastify.inject({
+        const response = await global.fastify.inject({
             method: "POST",
             url: "/api/auth/login",
             payload: {
@@ -41,7 +39,7 @@ describe("POST /api/auth/login", () => {
     });
 
     it("should return status 401, when password is incorrect", async () => {
-        const response = await fastify.inject({
+        const response = await global.fastify.inject({
             method: "POST",
             url: "/api/auth/login",
             payload: {
@@ -59,7 +57,7 @@ describe("POST /api/auth/login", () => {
     });
 
     it("should return status 401, when no user has email", async () => {
-        const response = await fastify.inject({
+        const response = await global.fastify.inject({
             method: "POST",
             url: "/api/auth/login",
             payload: {
@@ -77,7 +75,7 @@ describe("POST /api/auth/login", () => {
     });
 
     it("should return status 400, when no email or password has been provided", async () => {
-        const response = await fastify.inject({
+        const response = await global.fastify.inject({
             method: "POST",
             url: "/api/auth/login",
             payload: {},
@@ -92,7 +90,7 @@ describe("POST /api/auth/login", () => {
     });
 
     it("should return status 400, when no email has been provided", async () => {
-        const response = await fastify.inject({
+        const response = await global.fastify.inject({
             method: "POST",
             url: "/api/auth/login",
             payload: {
@@ -109,7 +107,7 @@ describe("POST /api/auth/login", () => {
     });
 
     it("should return status 400, when no password has been provided", async () => {
-        const response = await fastify.inject({
+        const response = await global.fastify.inject({
             method: "POST",
             url: "/api/auth/login",
             payload: {

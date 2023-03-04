@@ -2,8 +2,6 @@ import { hashSync } from "bcrypt";
 import { prisma } from "../../../plugins/prisma";
 
 describe("POST /api/auth/refresh", () => {
-    const fastify = global.fastify;
-
     beforeEach(async () => {
         await prisma.user.deleteMany();
     });
@@ -17,7 +15,7 @@ describe("POST /api/auth/refresh", () => {
             },
         });
 
-        const response = await fastify.inject({
+        const response = await global.fastify.inject({
             method: "POST",
             url: "/api/auth/refresh",
             cookies: {
@@ -47,7 +45,7 @@ describe("POST /api/auth/refresh", () => {
     });
 
     it("should return status 401, user does not exist", async () => {
-        const response = await fastify.inject({
+        const response = await global.fastify.inject({
             method: "POST",
             url: "/api/auth/refresh",
             cookies: {
@@ -70,7 +68,7 @@ describe("POST /api/auth/refresh", () => {
     });
 
     it("should return status 401, refreshToken cookie invalid", async () => {
-        const response = await fastify.inject({
+        const response = await global.fastify.inject({
             method: "POST",
             url: "/api/auth/refresh",
             cookies: {

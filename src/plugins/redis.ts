@@ -25,7 +25,7 @@ declare module "ioredis" {
     }
 }
 
-export let redis: Redis = global.redis;
+export let redis: Redis;
 
 export default fastifyPlugin(
     async (fastify: FastifyInstance, opts: FastifyPluginOptions) => {

@@ -2,8 +2,6 @@ import { prisma } from "../../../plugins/prisma";
 import { hashSync } from "bcrypt";
 
 describe("POST /api/auth/logout", () => {
-    const fastify = global.fastify;
-
     beforeEach(async () => {
         await prisma.user.deleteMany();
     });
@@ -17,7 +15,7 @@ describe("POST /api/auth/logout", () => {
             },
         });
 
-        const response = await fastify.inject({
+        const response = await global.fastify.inject({
             method: "POST",
             url: "/api/auth/logout",
             payload: {},

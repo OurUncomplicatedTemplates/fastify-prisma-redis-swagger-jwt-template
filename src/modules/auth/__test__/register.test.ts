@@ -1,14 +1,12 @@
 import { prisma } from "../../../plugins/prisma";
 
 describe("POST /api/auth/register", () => {
-    const fastify = global.fastify;
-
     beforeEach(async () => {
         await prisma.user.deleteMany();
     });
 
     it("should return status 201 and create a user", async () => {
-        const response = await fastify.inject({
+        const response = await global.fastify.inject({
             method: "POST",
             url: "/api/auth/register",
             payload: {
@@ -34,7 +32,7 @@ describe("POST /api/auth/register", () => {
             },
         });
 
-        const response = await fastify.inject({
+        const response = await global.fastify.inject({
             method: "POST",
             url: "/api/auth/register",
             payload: {
@@ -53,7 +51,7 @@ describe("POST /api/auth/register", () => {
     });
 
     it("should return status 400, when email is invalid", async () => {
-        const response = await fastify.inject({
+        const response = await global.fastify.inject({
             method: "POST",
             url: "/api/auth/register",
             payload: {
@@ -72,7 +70,7 @@ describe("POST /api/auth/register", () => {
     });
 
     it("should return status 400, when no email has been provided", async () => {
-        const response = await fastify.inject({
+        const response = await global.fastify.inject({
             method: "POST",
             url: "/api/auth/register",
             payload: {
@@ -90,7 +88,7 @@ describe("POST /api/auth/register", () => {
     });
 
     it("should return status 400, when email is empty", async () => {
-        const response = await fastify.inject({
+        const response = await global.fastify.inject({
             method: "POST",
             url: "/api/auth/register",
             payload: {
@@ -109,7 +107,7 @@ describe("POST /api/auth/register", () => {
     });
 
     it("should return status 400, when no password has been provided", async () => {
-        const response = await fastify.inject({
+        const response = await global.fastify.inject({
             method: "POST",
             url: "/api/auth/register",
             payload: {
@@ -127,7 +125,7 @@ describe("POST /api/auth/register", () => {
     });
 
     it("should return status 400, when password is empty", async () => {
-        const response = await fastify.inject({
+        const response = await global.fastify.inject({
             method: "POST",
             url: "/api/auth/register",
             payload: {
@@ -146,7 +144,7 @@ describe("POST /api/auth/register", () => {
     });
 
     it("should return status 400, when password is less than 8 characters", async () => {
-        const response = await fastify.inject({
+        const response = await global.fastify.inject({
             method: "POST",
             url: "/api/auth/register",
             payload: {
@@ -165,7 +163,7 @@ describe("POST /api/auth/register", () => {
     });
 
     it("should return status 400, when no name has been provided", async () => {
-        const response = await fastify.inject({
+        const response = await global.fastify.inject({
             method: "POST",
             url: "/api/auth/register",
             payload: {
@@ -183,7 +181,7 @@ describe("POST /api/auth/register", () => {
     });
 
     it("should return status 400, when name is empty", async () => {
-        const response = await fastify.inject({
+        const response = await global.fastify.inject({
             method: "POST",
             url: "/api/auth/register",
             payload: {
