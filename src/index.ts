@@ -12,7 +12,6 @@ export async function build() {
 
     await fastify.register(plugins);
 
-    // This has to be done manually as fastify autoload does not support adding schemas somehow?!
     for (const schema of [...authSchemas]) {
         fastify.addSchema(schema);
     }
