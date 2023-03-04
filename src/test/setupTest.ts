@@ -5,8 +5,15 @@ declare global {
     var fastify: FastifyInstance;
 }
 
+jest.mock("../plugins/prisma");
+jest.mock("../plugins/redis");
+
 beforeAll(async () => {
-    global.fastify = await build();
+    try {
+        global.fastify = await build();
+    } catch (e) {
+        console.error(e);
+    }
 });
 
 afterAll(async () => {

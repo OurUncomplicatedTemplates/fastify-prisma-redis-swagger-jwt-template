@@ -1,9 +1,9 @@
 import { build } from "./index";
 
 const start = async () => {
-    const fastify = await build();
-
     try {
+        const fastify = await build();
+
         await fastify.listen({
             host: fastify.config.HOST,
             port: fastify.config.PORT,

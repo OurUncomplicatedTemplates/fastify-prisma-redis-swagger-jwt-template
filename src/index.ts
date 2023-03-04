@@ -10,18 +10,14 @@ export async function build() {
         },
     });
 
-    try {
-        await fastify.register(plugins);
+    await fastify.register(plugins);
 
-        // This has to be done manually as fastify autoload does not support adding schemas somehow?!
-        for (const schema of [...authSchemas]) {
-            fastify.addSchema(schema);
-        }
-
-        await fastify.register(routes, { prefix: "/api" });
-    } catch (e) {
-        console.error(e);
+    // This has to be done manually as fastify autoload does not support adding schemas somehow?!
+    for (const schema of [...authSchemas]) {
+        fastify.addSchema(schema);
     }
+
+    await fastify.register(routes, { prefix: "/api" });
 
     return fastify;
 }
