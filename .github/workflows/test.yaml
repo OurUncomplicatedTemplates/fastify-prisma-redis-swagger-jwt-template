@@ -8,9 +8,8 @@ jobs:
         env:
             HOST: 127.0.0.1
             DATABASE_URL: "mysql://root:password@localhost:3306/overnites"
-            DATABASE_URL_TEST: "mysql://root:password@localhost:3306/overnites"
-            REDIS_HOST: "localhost"
-            REDIS_PASSWORD: ""
+            DATABASE_URL_WITHOUT_SCHEMA: "mysql://root:password@localhost:3306"
+            REDIS_URL: "redis://localhost"
             SECRET: "7ZB68E3HZ9HWGe8FzUvNWZcoYD9uuwkp25Y66S6RkszKadFMJCj9ShXL7TBcieG9yoRAsdTKzJcEgQUYbd6dtjXgmZMQhVNKypNeq6yKKLVht7gUtXypaoxgoRjQDHLceCWmJhM6GbwYiyLHmVYA8L9zuJUhYW2atZiv4Fxoc4YqzaCCrSZxzPBT9rFDSCtHsXXDEShMvULSStZvwt26tesWtxEMx5Q43a3s6eHrPJUPgVX3aAZsmYRu3bzCHvRp"
         steps:
             - uses: actions/checkout@v2
