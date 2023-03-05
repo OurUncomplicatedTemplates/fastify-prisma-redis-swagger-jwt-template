@@ -3,7 +3,6 @@ import { hashSync } from "bcrypt";
 
 describe("POST /api/auth/login", () => {
     beforeAll(async () => {
-        await prisma.user.deleteMany();
         await prisma.user.create({
             data: {
                 name: "Joe Biden the 1st",

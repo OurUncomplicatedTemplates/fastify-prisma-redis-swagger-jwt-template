@@ -10,6 +10,6 @@ export default fastifyPlugin(
             fastify.addSchema(schema);
         }
 
-        await Promise.all([fastify.register(authRoute, options)]);
+        await fastify.register(authRoute, options);
     }
 );

@@ -6,7 +6,6 @@ describe("GET /api/auth/user", () => {
     let user: User;
 
     beforeAll(async () => {
-        await prisma.user.deleteMany();
         user = await prisma.user.create({
             data: {
                 name: "Joe Biden the 1st",
