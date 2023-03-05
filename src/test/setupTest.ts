@@ -6,7 +6,6 @@ declare global {
 }
 
 jest.mock("../plugins/prisma");
-jest.mock("../plugins/redis");
 
 beforeAll(async () => {
     try {

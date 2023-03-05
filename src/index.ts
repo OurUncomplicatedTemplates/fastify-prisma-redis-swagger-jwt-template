@@ -1,7 +1,6 @@
 import Fastify from "fastify";
-import { authSchemas } from "./modules/auth/auth.schema";
 import plugins from "./plugins";
-import routes from "./routes";
+import modules from "./modules";
 
 export async function build() {
     const fastify = Fastify({
@@ -12,11 +11,7 @@ export async function build() {
 
     await fastify.register(plugins);
 
-    for (const schema of [...authSchemas]) {
-        fastify.addSchema(schema);
-    }
-
-    await fastify.register(routes, { prefix: "/api" });
+    await fastify.register(modules, { prefix: "/api" });
 
     return fastify;
 }

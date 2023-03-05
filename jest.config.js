@@ -9,7 +9,6 @@ module.exports = {
         "./src/**",
         "!./src/plugins/swagger.ts",
         "!./src/plugins/prisma.ts",
-        "!./src/plugins/redis.ts",
         "!./src/server.ts",
     ],
     coveragePathIgnorePatterns: ["node_modules"],

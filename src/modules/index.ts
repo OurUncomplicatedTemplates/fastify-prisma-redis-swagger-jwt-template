@@ -1,7 +1,17 @@
 import { FastifyInstance, FastifyPluginOptions } from "fastify";
 
 import fastifyPlugin from "fastify-plugin";
-import authRoute from "./modules/auth/auth.route";
+import auth from "./auth";
+
+const getOptionsWithPrefix = (
+    options: FastifyPluginOptions,
+    prefix: string
+) => {
+    return {
+        ...options,
+        prefix: options.prefix + prefix,
+    };
+};
 
 export default fastifyPlugin(
     async (fastify: FastifyInstance, options: FastifyPluginOptions) => {
@@ -10,7 +20,7 @@ export default fastifyPlugin(
         });
 
         await Promise.all([
-            fastify.register(authRoute, { prefix: options.prefix + "/auth" }),
+            fastify.register(auth, getOptionsWithPrefix(options, "/auth")),
         ]);
     }
 );

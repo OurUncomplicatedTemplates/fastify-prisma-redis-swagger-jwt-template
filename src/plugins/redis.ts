@@ -2,6 +2,7 @@ import { FastifyInstance, FastifyPluginOptions } from "fastify";
 import fastifyPlugin from "fastify-plugin";
 import fastifyRedis, { FastifyRedis } from "@fastify/redis";
 import Redis from "ioredis";
+import { v4 } from "uuid";
 
 declare module "fastify" {
     interface FastifyRequest {
@@ -29,7 +30,12 @@ export let redis: Redis;
 
 export default fastifyPlugin(
     async (fastify: FastifyInstance, opts: FastifyPluginOptions) => {
-        redis = new Redis(fastify.config.REDIS_URL);
+        redis = new Redis(fastify.config.REDIS_URL, {
+            keyPrefix:
+                fastify.config.NODE_ENV === "test"
+                    ? v4()
+                    : /* istanbul ignore next */ undefined,
+        });
 
         redis.remember = async (key, ttl, callback) => {
             let value = await fastify.redis.get(key);

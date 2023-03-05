@@ -8,6 +8,7 @@
         "christian-kohler.npm-intellisense",
         "christian-kohler.path-intellisense",
         "esbenp.prettier-vscode",
-        "Tyriar.sort-lines"
+        "Tyriar.sort-lines",
+        "EditorConfig.EditorConfig"
     ]
 }

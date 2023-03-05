@@ -8,7 +8,6 @@ import {
 } from "./auth.service";
 import { CreateUserInput, LoginInput } from "./auth.schema";
 import { compareSync } from "bcrypt";
-import { errorMessage } from "../../utils/string";
 
 export async function registerUserHandler(
     request: FastifyRequest<{
@@ -20,8 +19,8 @@ export async function registerUserHandler(
         const user = await createUser(request.body);
 
         return reply.code(201).send(user);
-    } catch (e) {
-        return reply.badRequest(errorMessage(e));
+    } catch (e: any) {
+        return reply.badRequest(e.message);
     }
 }
 
