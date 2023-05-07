@@ -6,40 +6,36 @@ Open [http://localhost:3000/api/docs](http://localhost:3000/api/docs) to view it
 
 In the project directory, you can run:
 
-### `npm run dev`
+### `make dev`
 
 To start the app in dev mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-### `npm run build`
+### `make prod`
 
-Builds production
+Build & runs production.
 
-### `npm run start`
-
-Run production
-
-### `npm run dev`
-
-Run development
-
-### `npm run test`
+### `make test`
 
 Run the test cases.
 
-### `npx prisma generate`
+### `make test-coverage`
+
+Run the test cases with code coverage.
+
+### `make prisma-generate`
 
 Generate/regenerate the prisma client. This should be done after changing the prisma schema.
 
-### `npm run migrate:dev`
+### `make migrate-dev`
 
 Migrate the prisma schema to the database and test database. This should only be run in the dev environment.
 
-### `npx prisma migrate reset`
+### `make migrate-reset`
 
 Clears the database and applies migrations. This should only be run in the dev environment.
 
-### `npx prisma migrate deploy`
+### `make migrate-deploy`
 
 Deploys the pending migrations to the databases.
 
