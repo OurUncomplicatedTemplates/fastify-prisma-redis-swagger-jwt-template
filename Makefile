@@ -1,5 +1,5 @@
 migrate-dev:
-	npx prisma migrate:dev
+	npx prisma migrate dev
 migrate-deploy:
 	npx prisma migrate deploy
 migrate-reset:

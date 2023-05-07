@@ -1,4 +1,4 @@
-import { FastifyInstance, FastifyPluginOptions } from "fastify";
+import { FastifyInstance } from "fastify";
 import fastifyPlugin from "fastify-plugin";
 import fastifyRedis, { FastifyRedis } from "@fastify/redis";
 import Redis from "ioredis";
@@ -29,8 +29,12 @@ declare module "ioredis" {
 export let redis: Redis;
 
 export default fastifyPlugin(
-    async (fastify: FastifyInstance, opts: FastifyPluginOptions) => {
-        redis = new Redis(fastify.config.REDIS_URL, {
+    async (fastify: FastifyInstance) => {
+        redis = new Redis({
+            host: fastify.config.REDIS_HOST,
+            port: fastify.config.REDIS_PORT,
+            username: fastify.config.REDIS_USER,
+            password: fastify.config.REDIS_PASSWORD,
             keyPrefix:
                 fastify.config.NODE_ENV === "test"
                     ? v4()
@@ -74,7 +78,7 @@ export default fastifyPlugin(
             return next();
         });
 
-        fastify.addHook("onClose", async (fastify) => {
+        fastify.addHook("onClose", async () => {
             redis.disconnect();
         });
     },

@@ -6,12 +6,15 @@ import fastifyPlugin from "fastify-plugin";
 declare module "fastify" {
     interface FastifyInstance {
         config: {
-            NODE_ENV: string;
             SECRET: string;
             HOST: string;
             PORT: number;
             DATABASE_URL: string;
-            REDIS_URL: string;
+            REDIS_HOST: string | undefined;
+            REDIS_PORT: number | undefined;
+            REDIS_USER: string | undefined;
+            REDIS_PASSWORD: string | undefined;
+            NODE_ENV: string;
         };
     }
 }
@@ -24,11 +27,10 @@ export default fastifyPlugin(
     ) => {
         const schema = {
             type: "object",
-            required: ["HOST", "PORT", "DATABASE_URL", "SECRET", "REDIS_URL"],
+            required: ["SECRET", "DATABASE_URL", "REDIS_HOST"],
             properties: {
-                NODE_ENV: {
+                SECRET: {
                     type: "string",
-                    default: "prod",
                 },
                 HOST: {
                     type: "string",
@@ -38,14 +40,27 @@ export default fastifyPlugin(
                     type: "number",
                     default: 3000,
                 },
-                SECRET: {
-                    type: "string",
-                },
                 DATABASE_URL: {
                     type: "string",
                 },
-                REDIS_URL: {
+                REDIS_HOST: {
                     type: "string",
+                },
+                REDIS_PORT: {
+                    type: "string",
+                    default: undefined,
+                },
+                REDIS_USER: {
+                    type: "string",
+                    default: undefined,
+                },
+                REDIS_PASSWORD: {
+                    type: "string",
+                    default: undefined,
+                },
+                NODE_ENV: {
+                    type: "string",
+                    default: "prod",
                 },
             },
         };

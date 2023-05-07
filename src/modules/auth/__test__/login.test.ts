@@ -22,7 +22,7 @@ describe("POST /api/auth/login", () => {
             },
         });
 
-        const refreshToken: any = response.cookies[0];
+        const refreshToken: { value: string } = response.cookies[0];
 
         expect(response.statusCode).toBe(200);
         expect(fastify.jwt.verify(refreshToken.value)).toBeTruthy();

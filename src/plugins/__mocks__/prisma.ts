@@ -4,7 +4,7 @@ import { join } from "path";
 import { v4 } from "uuid";
 
 import { fastifyPlugin } from "fastify-plugin";
-import { FastifyInstance, FastifyPluginOptions } from "fastify";
+import { FastifyInstance } from "fastify";
 
 if (!process.env.DATABASE_URL_WITHOUT_SCHEMA) {
     throw new Error("env variable DATABASE_URL_WITHOUT_SCHEMA is not set");
@@ -44,8 +44,8 @@ export const prisma = new PrismaClient({
 });
 
 export default fastifyPlugin(
-    async (fastify: FastifyInstance, options: FastifyPluginOptions) => {
-        fastify.addHook("onClose", async (fastify) => {
+    async (fastify: FastifyInstance) => {
+        fastify.addHook("onClose", async () => {
             await prisma.$disconnect();
         });
     },

@@ -19,8 +19,13 @@ export async function registerUserHandler(
         const user = await createUser(request.body);
 
         return reply.code(201).send(user);
-    } catch (e: any) {
-        return reply.badRequest(e.message);
+    } catch (e) {
+        if (e instanceof Error) {
+            return reply.badRequest(e.message);
+        }
+
+        /* istanbul ignore next */
+        throw e;
     }
 }
 

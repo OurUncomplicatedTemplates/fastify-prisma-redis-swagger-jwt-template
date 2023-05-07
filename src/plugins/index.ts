@@ -1,4 +1,4 @@
-import { FastifyInstance, FastifyPluginOptions } from "fastify";
+import { FastifyInstance } from "fastify";
 
 import fastifyPlugin from "fastify-plugin";
 import config from "./config";
@@ -9,20 +9,15 @@ import swagger from "./swagger";
 import cookie from "./cookie";
 import jwt from "./jwt";
 
-export default fastifyPlugin(
-    async (fastify: FastifyInstance, options: FastifyPluginOptions) => {
-        await Promise.all([
-            fastify.register(config),
-            fastify.register(sensible),
-        ]);
+export default fastifyPlugin(async (fastify: FastifyInstance) => {
+    await Promise.all([fastify.register(config), fastify.register(sensible)]);
 
-        await Promise.all([
-            fastify.register(prisma),
-            fastify.register(redis),
-            fastify.register(swagger),
-            fastify.register(cookie),
-        ]);
+    await Promise.all([
+        fastify.register(prisma),
+        fastify.register(redis),
+        fastify.register(swagger),
+        fastify.register(cookie),
+    ]);
 
-        await Promise.all([fastify.register(jwt)]);
-    }
-);
+    await Promise.all([fastify.register(jwt)]);
+});

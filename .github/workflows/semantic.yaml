@@ -1,4 +1,4 @@
-name: semantic
+name: Semantic
 
 on: [pull_request]
 

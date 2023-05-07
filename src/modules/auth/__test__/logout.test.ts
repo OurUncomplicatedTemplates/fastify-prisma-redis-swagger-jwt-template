@@ -30,7 +30,7 @@ describe("POST /api/auth/logout", () => {
             },
         });
 
-        const refreshToken: any = response.cookies[0];
+        const refreshToken: { value: string } = response.cookies[0];
 
         expect(response.statusCode).toBe(200);
         expect(refreshToken).toEqual({

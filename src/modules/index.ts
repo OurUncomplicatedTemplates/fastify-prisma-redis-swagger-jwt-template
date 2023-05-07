@@ -15,7 +15,7 @@ const getOptionsWithPrefix = (
 
 export default fastifyPlugin(
     async (fastify: FastifyInstance, options: FastifyPluginOptions) => {
-        fastify.get("/api/health", async (request, response) => {
+        fastify.get("/api/health", async () => {
             return { status: "OK" };
         });
 

@@ -1,4 +1,4 @@
-import { FastifyInstance, FastifyPluginOptions } from "fastify";
+import { FastifyInstance } from "fastify";
 import {
     loginHandler,
     registerUserHandler,
@@ -8,7 +8,7 @@ import {
 } from "./auth.controller";
 import { $ref } from "./auth.schema";
 
-export default async (fastify: FastifyInstance, opts: FastifyPluginOptions) => {
+export default async (fastify: FastifyInstance) => {
     fastify.post(
         "/register",
         {

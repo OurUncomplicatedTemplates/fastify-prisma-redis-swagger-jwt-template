@@ -2,6 +2,7 @@ import { FastifyInstance } from "fastify";
 import { build } from "../index";
 
 declare global {
+    // eslint-disable-next-line no-var
     var fastify: FastifyInstance;
 }
 

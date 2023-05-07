@@ -1,7 +1,7 @@
 import fastifyPlugin from "fastify-plugin";
 import fastifySwagger from "@fastify/swagger";
 import fastifySwaggerUI from "@fastify/swagger-ui";
-import { FastifyInstance, FastifyPluginOptions } from "fastify";
+import { FastifyInstance } from "fastify";
 
 /**
  * This plugins adds some utilities to handle http errors
@@ -9,7 +9,7 @@ import { FastifyInstance, FastifyPluginOptions } from "fastify";
  * @see https://github.com/fastify/fastify-swagger
  */
 export default fastifyPlugin(
-    async (fastify: FastifyInstance, opts: FastifyPluginOptions) => {
+    async (fastify: FastifyInstance) => {
         if (fastify.config.NODE_ENV === "test") {
             return;
         }
@@ -18,7 +18,7 @@ export default fastifyPlugin(
             mode: "dynamic",
             openapi: {
                 info: {
-                    title: "Overnites API",
+                    title: "API",
                     version: "1.0.0",
                 },
             },

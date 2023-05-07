@@ -1,9 +1,4 @@
-import {
-    FastifyInstance,
-    FastifyPluginOptions,
-    FastifyReply,
-    FastifyRequest,
-} from "fastify";
+import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import fastifyPlugin from "fastify-plugin";
 import fastifyJwt, { JWT } from "@fastify/jwt";
 
@@ -27,7 +22,7 @@ declare module "@fastify/jwt" {
 }
 
 export default fastifyPlugin(
-    async (fastify: FastifyInstance, opts: FastifyPluginOptions) => {
+    async (fastify: FastifyInstance) => {
         fastify.register(fastifyJwt, {
             secret: fastify.config.SECRET,
             cookie: {
