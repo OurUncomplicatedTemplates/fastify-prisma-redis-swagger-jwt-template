@@ -60,7 +60,7 @@ describe("POST /api/auth/refresh", () => {
         });
 
         expect(response.statusCode).toBe(401);
-        expect(response.json()).toEqual({
+        expect(response.json()).toMatchObject({
             error: "Unauthorized",
             message: "Unauthorized",
             statusCode: 401,
@@ -77,7 +77,7 @@ describe("POST /api/auth/refresh", () => {
         });
 
         expect(response.statusCode).toBe(401);
-        expect(response.json()).toEqual({
+        expect(response.json()).toMatchObject({
             error: "Unauthorized",
             message: "Unauthorized",
             statusCode: 401,

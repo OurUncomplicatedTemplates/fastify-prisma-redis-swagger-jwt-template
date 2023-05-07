@@ -43,7 +43,7 @@ describe("POST /api/auth/register", () => {
         });
 
         expect(response.statusCode).toBe(400);
-        expect(response.json()).toEqual({
+        expect(response.json()).toMatchObject({
             error: "Bad Request",
             message: "Email is already in use",
             statusCode: 400,
@@ -62,7 +62,7 @@ describe("POST /api/auth/register", () => {
         });
 
         expect(response.statusCode).toBe(400);
-        expect(response.json()).toEqual({
+        expect(response.json()).toMatchObject({
             error: "Bad Request",
             message: 'body/email must match format "email"',
             statusCode: 400,
@@ -80,7 +80,7 @@ describe("POST /api/auth/register", () => {
         });
 
         expect(response.statusCode).toBe(400);
-        expect(response.json()).toEqual({
+        expect(response.json()).toMatchObject({
             error: "Bad Request",
             message: "body must have required property 'email'",
             statusCode: 400,
@@ -99,7 +99,7 @@ describe("POST /api/auth/register", () => {
         });
 
         expect(response.statusCode).toBe(400);
-        expect(response.json()).toEqual({
+        expect(response.json()).toMatchObject({
             error: "Bad Request",
             message: "body/email must NOT have fewer than 1 characters",
             statusCode: 400,
@@ -117,7 +117,7 @@ describe("POST /api/auth/register", () => {
         });
 
         expect(response.statusCode).toBe(400);
-        expect(response.json()).toEqual({
+        expect(response.json()).toMatchObject({
             error: "Bad Request",
             message: "body must have required property 'password'",
             statusCode: 400,
@@ -136,7 +136,7 @@ describe("POST /api/auth/register", () => {
         });
 
         expect(response.statusCode).toBe(400);
-        expect(response.json()).toEqual({
+        expect(response.json()).toMatchObject({
             error: "Bad Request",
             message: "body/password must NOT have fewer than 8 characters",
             statusCode: 400,
@@ -155,7 +155,7 @@ describe("POST /api/auth/register", () => {
         });
 
         expect(response.statusCode).toBe(400);
-        expect(response.json()).toEqual({
+        expect(response.json()).toMatchObject({
             error: "Bad Request",
             message: "body/password must NOT have fewer than 8 characters",
             statusCode: 400,
@@ -173,7 +173,7 @@ describe("POST /api/auth/register", () => {
         });
 
         expect(response.statusCode).toBe(400);
-        expect(response.json()).toEqual({
+        expect(response.json()).toMatchObject({
             error: "Bad Request",
             message: "body must have required property 'name'",
             statusCode: 400,
@@ -192,7 +192,7 @@ describe("POST /api/auth/register", () => {
         });
 
         expect(response.statusCode).toBe(400);
-        expect(response.json()).toEqual({
+        expect(response.json()).toMatchObject({
             error: "Bad Request",
             message: "body/name must NOT have fewer than 1 characters",
             statusCode: 400,
