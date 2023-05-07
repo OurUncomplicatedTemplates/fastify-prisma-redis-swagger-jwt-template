@@ -1,4 +1,5 @@
 /** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
+// eslint-disable-next-line no-undef
 module.exports = {
     preset: "ts-jest",
     transform: {
@@ -7,7 +8,6 @@ module.exports = {
     setupFilesAfterEnv: ["./src/test/setupTest.ts"],
     collectCoverageFrom: [
         "./src/**",
-        "!./src/plugins/swagger.ts",
         "!./src/plugins/prisma.ts",
         "!./src/server.ts",
     ],
