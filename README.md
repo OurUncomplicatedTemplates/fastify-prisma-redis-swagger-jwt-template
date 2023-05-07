@@ -1,3 +1,7 @@
+# Project
+
+[![Coverage Status](https://frederikpyt.github.io/fastify-prisma-redis-swagger-jwt-template/badge.svg)](https://frederikpyt.github.io/fastify-prisma-redis-swagger-jwt-template)
+
 ## API documentation (Swagger)
 
 Open [http://localhost:3000/api/docs](http://localhost:3000/api/docs) to view it in the browser.

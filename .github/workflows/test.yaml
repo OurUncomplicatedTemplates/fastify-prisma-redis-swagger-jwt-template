@@ -42,6 +42,12 @@ jobs:
             - name: Run tests
               run: npm run test -- --coverage
 
+            - name: Generate coverage badge
+              uses: jaywcjlove/coverage-badges-cli@main
+              with:
+                  source: coverage/coverage-summary.json
+                  output: coverage/lcov-report/badge.svg
+
             - name: Publish coverage report to GitHub Pages
               if: ${{ github.ref == 'refs/heads/master' }}
               uses: JamesIves/github-pages-deploy-action@v4
