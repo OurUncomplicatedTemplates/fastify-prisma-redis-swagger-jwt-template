@@ -6,6 +6,7 @@
     "scripts": {
         "test": "jest --bail",
         "build": "tsc -p tsconfig.build.json",
+        "vercel-build": "prisma generate",
         "start": "node build/server.js",
         "lint": "eslint src",
         "dev": "tsnd --respawn --transpile-only --exit-child src/server.ts",
