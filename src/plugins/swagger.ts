@@ -1,3 +1,5 @@
+/* istanbul ignore file */
+
 import fastifyPlugin from "fastify-plugin";
 import fastifySwagger from "@fastify/swagger";
 import fastifySwaggerUI from "@fastify/swagger-ui";
@@ -19,6 +21,10 @@ export default fastifyPlugin(
                 },
             },
         });
+
+        if (fastify.config.NODE_ENV === "prod") {
+            return;
+        }
 
         await fastify.register(fastifySwaggerUI, {
             routePrefix: "/api/docs",

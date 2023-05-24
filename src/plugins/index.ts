@@ -15,8 +15,10 @@ export default fastifyPlugin(async (fastify: FastifyInstance) => {
     await Promise.all([
         fastify.register(prisma),
         fastify.register(redis),
-        fastify.register(swagger),
         fastify.register(cookie),
+        fastify.config.NODE_ENV !== "test"
+            ? /* istanbul ignore next */ fastify.register(swagger)
+            : /* istanbul ignore next */ null,
     ]);
 
     await Promise.all([fastify.register(jwt)]);

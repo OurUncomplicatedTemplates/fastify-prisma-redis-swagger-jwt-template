@@ -3,6 +3,9 @@ import { FastifyInstance, FastifyPluginOptions } from "fastify";
 import fastifyEnv from "@fastify/env";
 import fastifyPlugin from "fastify-plugin";
 
+const NODE_ENVS = ["prod", "test", "local"] as const;
+type NODE_ENV = (typeof NODE_ENVS)[number];
+
 declare module "fastify" {
     interface FastifyInstance {
         config: {
@@ -14,7 +17,7 @@ declare module "fastify" {
             REDIS_PORT: number | undefined;
             REDIS_USER: string | undefined;
             REDIS_PASSWORD: string | undefined;
-            NODE_ENV: string;
+            NODE_ENV: NODE_ENV;
         };
     }
 }
@@ -80,6 +83,17 @@ export default fastifyPlugin(
             // explicit schema
             removeAdditional: true,
         };
+
+        /* istanbul ignore next */
+        if (
+            NODE_ENVS.find(
+                (validName) => validName === process.env.NODE_ENV
+            ) === undefined
+        ) {
+            throw new Error(
+                "NODE_ENV is not valid, it must be one of 'prod', 'test' or 'local'"
+            );
+        }
 
         fastifyEnv(fastify, configOptions, done);
     },

@@ -1,12 +1,14 @@
 import { FastifyInstance } from "fastify";
 import fastifyPlugin from "fastify-plugin";
-import fastifyRedis, { FastifyRedis } from "@fastify/redis";
 import Redis from "ioredis";
 import { v4 } from "uuid";
 
 declare module "fastify" {
     interface FastifyRequest {
-        redis: FastifyRedis;
+        redis: Redis;
+    }
+    interface FastifyInstance {
+        redis: Redis;
     }
 }
 
@@ -37,12 +39,12 @@ export default fastifyPlugin(
             password: fastify.config.REDIS_PASSWORD,
             keyPrefix:
                 fastify.config.NODE_ENV === "test"
-                    ? v4()
+                    ? /* istanbul ignore next */ v4()
                     : /* istanbul ignore next */ undefined,
         });
 
         redis.remember = async (key, ttl, callback) => {
-            let value = await fastify.redis.get(key);
+            let value = await redis.get(key);
 
             if (value !== null) {
                 return value;
@@ -50,14 +52,14 @@ export default fastifyPlugin(
 
             value = await callback();
 
-            await fastify.redis.setex(key, ttl, value);
+            await redis.setex(key, ttl, value);
 
             return value;
         };
 
         redis.rememberJSON = async (key, ttl, callback) => {
             return JSON.parse(
-                await fastify.redis.remember(key, ttl, async () => {
+                await redis.remember(key, ttl, async () => {
                     return JSON.stringify(await callback());
                 })
             );
@@ -66,16 +68,14 @@ export default fastifyPlugin(
         redis.invalidateCaches = async (...keys) => {
             await Promise.all(
                 keys.map(async (key) => {
-                    await fastify.redis.del(key);
+                    await redis.del(key);
                 })
             );
         };
 
-        await fastify.register(fastifyRedis, { client: redis });
-
-        fastify.addHook("preHandler", (req, reply, next) => {
-            req.redis = fastify.redis;
-            return next();
+        fastify.decorate("redis", redis);
+        fastify.decorateRequest("redis", {
+            getter: /* istanbul ignore next */ () => redis,
         });
 
         fastify.addHook("onClose", async () => {
