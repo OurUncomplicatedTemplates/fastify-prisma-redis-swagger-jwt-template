@@ -12,7 +12,10 @@ beforeAll(async () => {
     try {
         global.fastify = await build();
     } catch (e) {
-        console.error(e);
+        console.error(
+            "beforeAll() - Building fastify caused an unknown exception",
+            e
+        );
     }
 });
 

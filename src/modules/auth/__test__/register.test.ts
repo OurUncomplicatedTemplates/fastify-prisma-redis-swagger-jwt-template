@@ -1,6 +1,13 @@
 import { prisma } from "../../../plugins/prisma";
+import UserService from "../user.service";
 
 describe("POST /api/auth/register", () => {
+    let userService: UserService;
+
+    beforeAll(async () => {
+        userService = new UserService();
+    });
+
     beforeEach(async () => {
         await prisma.user.deleteMany();
     });
@@ -10,7 +17,7 @@ describe("POST /api/auth/register", () => {
             method: "POST",
             url: "/api/auth/register",
             payload: {
-                name: "Joe Biden",
+                name: "Joe Biden the 1st",
                 email: "joe@biden.com",
                 password: "12345678",
             },
@@ -18,25 +25,23 @@ describe("POST /api/auth/register", () => {
 
         expect(response.statusCode).toBe(201);
         expect(response.json()).toEqual({
-            name: "Joe Biden",
+            name: "Joe Biden the 1st",
             email: "joe@biden.com",
         });
     });
 
     it("should return status 400, when email is already in use", async () => {
-        await prisma.user.create({
-            data: {
-                name: "Joe Biden the 1st",
-                email: "joe@biden.com",
-                password: "12345678",
-            },
+        await userService.createUser({
+            name: "Joe Biden the 1st",
+            email: "joe@biden.com",
+            password: "12345678",
         });
 
         const response = await global.fastify.inject({
             method: "POST",
             url: "/api/auth/register",
             payload: {
-                name: "Joe Biden",
+                name: "Joe Biden the 1st",
                 email: "joe@biden.com",
                 password: "12345678",
             },
@@ -55,7 +60,7 @@ describe("POST /api/auth/register", () => {
             method: "POST",
             url: "/api/auth/register",
             payload: {
-                name: "Joe Biden",
+                name: "Joe Biden the 1st",
                 email: "joebiden.com",
                 password: "12345678",
             },
@@ -74,7 +79,7 @@ describe("POST /api/auth/register", () => {
             method: "POST",
             url: "/api/auth/register",
             payload: {
-                name: "Joe Biden",
+                name: "Joe Biden the 1st",
                 password: "12345678",
             },
         });
@@ -92,7 +97,7 @@ describe("POST /api/auth/register", () => {
             method: "POST",
             url: "/api/auth/register",
             payload: {
-                name: "Joe Biden",
+                name: "Joe Biden the 1st",
                 email: "",
                 password: "12345678",
             },
@@ -111,7 +116,7 @@ describe("POST /api/auth/register", () => {
             method: "POST",
             url: "/api/auth/register",
             payload: {
-                name: "Joe Biden",
+                name: "Joe Biden the 1st",
                 email: "joe@biden.com",
             },
         });
@@ -129,7 +134,7 @@ describe("POST /api/auth/register", () => {
             method: "POST",
             url: "/api/auth/register",
             payload: {
-                name: "Joe Biden",
+                name: "Joe Biden the 1st",
                 email: "joe@biden.com",
                 password: "",
             },
@@ -148,7 +153,7 @@ describe("POST /api/auth/register", () => {
             method: "POST",
             url: "/api/auth/register",
             payload: {
-                name: "Joe Biden",
+                name: "Joe Biden the 1st",
                 email: "joe@biden.com",
                 password: "1234567",
             },
