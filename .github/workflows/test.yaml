@@ -46,10 +46,10 @@ jobs:
               uses: jaywcjlove/coverage-badges-cli@main
               with:
                   source: coverage/coverage-summary.json
-                  output: coverage/lcov-report/badge.svg
+                  output: coverage/badge.svg
 
             - name: Publish coverage report to GitHub Pages
               if: ${{ github.ref == 'refs/heads/master' }}
               uses: JamesIves/github-pages-deploy-action@v4
               with:
-                  folder: coverage/lcov-report
+                  folder: coverage

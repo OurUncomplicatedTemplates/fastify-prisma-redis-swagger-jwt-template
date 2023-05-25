@@ -22,10 +22,6 @@ export default fastifyPlugin(
             },
         });
 
-        if (fastify.config.NODE_ENV === "prod") {
-            return;
-        }
-
         await fastify.register(fastifySwaggerUI, {
             routePrefix: "/api/docs",
             initOAuth: {},

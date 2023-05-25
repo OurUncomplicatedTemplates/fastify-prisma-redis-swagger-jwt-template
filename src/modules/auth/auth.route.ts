@@ -1,14 +1,11 @@
 import { FastifyInstance } from "fastify";
-import {
-    loginHandler,
-    registerUserHandler,
-    refreshHandler,
-    logoutHandler,
-    userHandler,
-} from "./auth.controller";
+import AuthController from "./auth.controller";
 import { $ref } from "./auth.schema";
+import AuthService from "./auth.service";
 
 export default async (fastify: FastifyInstance) => {
+    const authController = new AuthController(new AuthService());
+
     fastify.post(
         "/register",
         {
@@ -20,7 +17,7 @@ export default async (fastify: FastifyInstance) => {
                 },
             },
         },
-        registerUserHandler
+        authController.registerUserHandler.bind(authController)
     );
 
     fastify.post(
@@ -34,7 +31,7 @@ export default async (fastify: FastifyInstance) => {
                 },
             },
         },
-        loginHandler
+        authController.loginHandler.bind(authController)
     );
 
     fastify.post(
@@ -48,7 +45,7 @@ export default async (fastify: FastifyInstance) => {
                 description: "The `refreshToken` cookie is required",
             },
         },
-        refreshHandler
+        authController.refreshHandler.bind(authController)
     );
 
     fastify.post(
@@ -61,7 +58,7 @@ export default async (fastify: FastifyInstance) => {
                 },
             },
         },
-        logoutHandler
+        authController.logoutHandler.bind(authController)
     );
 
     fastify.get(
@@ -78,6 +75,6 @@ export default async (fastify: FastifyInstance) => {
             },
             onRequest: [fastify.authenticate],
         },
-        userHandler
+        authController.userHandler.bind(authController)
     );
 };

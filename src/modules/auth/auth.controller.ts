@@ -1,115 +1,120 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import {
-    createAccessToken,
-    createRefreshToken,
-    createUser,
-    getUserByEmail,
-    getUserById,
-} from "./auth.service";
+import AuthService from "./auth.service";
 import { CreateUserInput, LoginInput } from "./auth.schema";
 import { compareSync } from "bcrypt";
+import { FastifyJWT } from "@fastify/jwt";
 
-export async function registerUserHandler(
-    request: FastifyRequest<{
-        Body: CreateUserInput;
-    }>,
-    reply: FastifyReply
-) {
-    try {
-        const user = await createUser(request.body);
+export default class AuthController {
+    private authService: AuthService;
 
-        return reply.code(201).send(user);
-    } catch (e) {
-        if (e instanceof Error) {
-            return reply.badRequest(e.message);
-        }
-
-        /* istanbul ignore next */
-        throw e;
-    }
-}
-
-export async function loginHandler(
-    request: FastifyRequest<{
-        Body: LoginInput;
-    }>,
-    reply: FastifyReply
-) {
-    const user = await getUserByEmail(request.body.email);
-
-    if (!user || !compareSync(request.body.password, user.password)) {
-        return reply.unauthorized("email and/or password incorrect");
+    constructor(authService: AuthService) {
+        this.authService = authService;
     }
 
-    return reply
-        .code(200)
-        .setCookie("refreshToken", createRefreshToken(user, request.jwt), {
-            path: "/api/auth/refresh",
-            secure: true,
-            httpOnly: true,
-            sameSite: true,
-        })
-        .send({
-            accessToken: createAccessToken(user, request.jwt),
-        });
-}
+    async registerUserHandler(
+        request: FastifyRequest<{
+            Body: CreateUserInput;
+        }>,
+        reply: FastifyReply
+    ) {
+        try {
+            const user = await this.authService.createUser(request.body);
 
-export async function refreshHandler(
-    request: FastifyRequest,
-    reply: FastifyReply
-) {
-    try {
-        const refrestTokenPayload = await request.jwtVerify<{
-            sub: number;
-            iat: number;
-            exp: number;
-        }>({ onlyCookie: true });
+            return reply.code(201).send(user);
+        } catch (e) {
+            if (e instanceof Error) {
+                return reply.badRequest(e.message);
+            }
 
-        const user = await getUserById(refrestTokenPayload.sub);
-
-        if (!user) {
-            return reply.unauthorized();
+            /* istanbul ignore next */
+            throw e;
         }
+    }
+
+    async loginHandler(
+        request: FastifyRequest<{
+            Body: LoginInput;
+        }>,
+        reply: FastifyReply
+    ) {
+        const user = await this.authService.getUserByEmail(request.body.email);
+
+        if (!user || !compareSync(request.body.password, user.password)) {
+            return reply.unauthorized("email and/or password incorrect");
+        }
+
+        const { refreshToken, accessToken } = this.authService.createTokens(
+            user,
+            request.jwt
+        );
 
         return reply
             .code(200)
-            .setCookie("refreshToken", createRefreshToken(user, request.jwt), {
+            .setCookie("refreshToken", refreshToken, {
                 path: "/api/auth/refresh",
                 secure: true,
                 httpOnly: true,
                 sameSite: true,
             })
             .send({
-                accessToken: createAccessToken(user, request.jwt),
+                accessToken: accessToken,
             });
-    } catch (err) {
-        return reply.unauthorized();
-    }
-}
-
-export async function logoutHandler(
-    request: FastifyRequest,
-    reply: FastifyReply
-) {
-    return reply
-        .code(200)
-        .clearCookie("refreshToken", {
-            path: "/api/auth/refresh",
-            secure: true,
-            httpOnly: true,
-            sameSite: true,
-        })
-        .send();
-}
-
-export async function userHandler(
-    request: FastifyRequest,
-    reply: FastifyReply
-) {
-    const user = await getUserById(request.user.sub);
-    if (!user) {
-        return reply.unauthorized();
     }
 
-    return reply.code(200).send(user);
+    async refreshHandler(request: FastifyRequest, reply: FastifyReply) {
+        try {
+            const refreshTokenPayload = await request.jwtVerify<
+                FastifyJWT["user"]
+            >({ onlyCookie: true });
+
+            const user = await this.authService.getUserById(
+                refreshTokenPayload.sub
+            );
+
+            if (!user) {
+                return reply.unauthorized();
+            }
+
+            const { refreshToken, accessToken } = this.authService.createTokens(
+                user,
+                request.jwt,
+                refreshTokenPayload.aex
+            );
+
+            return reply
+                .code(200)
+                .setCookie("refreshToken", refreshToken, {
+                    path: "/api/auth/refresh",
+                    secure: true,
+                    httpOnly: true,
+                    sameSite: true,
+                })
+                .send({
+                    accessToken: accessToken,
+                });
+        } catch (err) {
+            return reply.unauthorized();
+        }
+    }
+
+    async logoutHandler(request: FastifyRequest, reply: FastifyReply) {
+        return reply
+            .code(200)
+            .clearCookie("refreshToken", {
+                path: "/api/auth/refresh",
+                secure: true,
+                httpOnly: true,
+                sameSite: true,
+            })
+            .send();
+    }
+
+    async userHandler(request: FastifyRequest, reply: FastifyReply) {
+        const user = await this.authService.getUserById(request.user.sub);
+        if (!user) {
+            return reply.unauthorized();
+        }
+
+        return reply.code(200).send(user);
+    }
 }

@@ -1,6 +1,7 @@
 import { User } from "@prisma/client";
 import { hashSync } from "bcrypt";
 import { prisma } from "../../../plugins/prisma";
+import TimeUtil from "../../../utils/time";
 
 describe("GET /api/auth/user", () => {
     let user: User;
@@ -25,7 +26,8 @@ describe("GET /api/auth/user", () => {
                     fastify.jwt.sign(
                         {
                             sub: user.id,
-                            iat: Number(Date()),
+                            iat: TimeUtil.getNowUnixTimeStamp(),
+                            aex: TimeUtil.getNowUnixTimeStamp() + 60,
                         },
                         { expiresIn: "10m" }
                     ),
@@ -49,7 +51,8 @@ describe("GET /api/auth/user", () => {
                     fastify.jwt.sign(
                         {
                             sub: 542,
-                            iat: Number(Date()),
+                            iat: TimeUtil.getNowUnixTimeStamp(),
+                            aex: TimeUtil.getNowUnixTimeStamp() + 60,
                         },
                         { expiresIn: "10m" }
                     ),

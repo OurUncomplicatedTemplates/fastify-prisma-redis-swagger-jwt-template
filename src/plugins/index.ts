@@ -16,7 +16,7 @@ export default fastifyPlugin(async (fastify: FastifyInstance) => {
         fastify.register(prisma),
         fastify.register(redis),
         fastify.register(cookie),
-        fastify.config.NODE_ENV !== "test"
+        fastify.config.NODE_ENV === "local"
             ? /* istanbul ignore next */ fastify.register(swagger)
             : /* istanbul ignore next */ null,
     ]);

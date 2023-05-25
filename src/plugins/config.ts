@@ -87,7 +87,7 @@ export default fastifyPlugin(
         /* istanbul ignore next */
         if (
             NODE_ENVS.find(
-                (validName) => validName === process.env.NODE_ENV
+                (validName) => validName === process.env.NODE_ENV ?? "prod"
             ) === undefined
         ) {
             throw new Error(

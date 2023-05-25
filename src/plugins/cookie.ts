@@ -5,7 +5,7 @@ import fastifyPlugin from "fastify-plugin";
 
 export default fastifyPlugin(
     async (fastify: FastifyInstance) => {
-        fastify.register(fastifyCookie, {
+        await fastify.register(fastifyCookie, {
             secret: fastify.config.SECRET,
             parseOptions: {},
         });
