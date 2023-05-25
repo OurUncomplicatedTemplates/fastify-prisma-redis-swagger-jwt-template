@@ -23,7 +23,8 @@ describe("POST /api/auth/logout", () => {
                 refreshToken: fastify.jwt.sign(
                     {
                         sub: user.id,
-                        iat: Number(Date()),
+                        iat: Math.floor(new Date().getTime() / 1000),
+                        aex: Math.floor(new Date().getTime() / 1000) + 60,
                     },
                     { expiresIn: "1d" }
                 ),

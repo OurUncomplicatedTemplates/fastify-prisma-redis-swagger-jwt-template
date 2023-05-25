@@ -9,6 +9,7 @@
         "christian-kohler.path-intellisense",
         "esbenp.prettier-vscode",
         "Tyriar.sort-lines",
-        "EditorConfig.EditorConfig"
+        "EditorConfig.EditorConfig",
+        "Prisma.prisma"
     ]
 }

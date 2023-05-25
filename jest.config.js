@@ -11,6 +11,6 @@ module.exports = {
         "!./src/plugins/prisma.ts",
         "!./src/server.ts",
     ],
-    coverageReporters: ["json-summary", "text", "lcov"],
+    coverageReporters: ["json-summary", "text", "html"],
     coveragePathIgnorePatterns: ["node_modules"],
 };

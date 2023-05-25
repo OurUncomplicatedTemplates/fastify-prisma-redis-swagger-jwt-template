@@ -25,7 +25,8 @@ describe("GET /api/auth/user", () => {
                     fastify.jwt.sign(
                         {
                             sub: user.id,
-                            iat: Number(Date()),
+                            iat: Math.floor(new Date().getTime() / 1000),
+                            aex: Math.floor(new Date().getTime() / 1000) + 60,
                         },
                         { expiresIn: "10m" }
                     ),
@@ -49,7 +50,8 @@ describe("GET /api/auth/user", () => {
                     fastify.jwt.sign(
                         {
                             sub: 542,
-                            iat: Number(Date()),
+                            iat: Math.floor(new Date().getTime() / 1000),
+                            aex: Math.floor(new Date().getTime() / 1000 + 60),
                         },
                         { expiresIn: "10m" }
                     ),
