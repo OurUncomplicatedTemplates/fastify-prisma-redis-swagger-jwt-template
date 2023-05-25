@@ -3,6 +3,7 @@ import { User } from "@prisma/client";
 import { hashSync } from "bcrypt";
 import { prisma } from "../../plugins/prisma";
 import { CreateUserInput } from "./auth.schema";
+import TimeUtil from "../../utils/time";
 
 export default class AuthService {
     async createUser(input: CreateUserInput) {
@@ -33,14 +34,14 @@ export default class AuthService {
 
     createTokens(user: User, jwt: JWT, aex: number | null = null) {
         if (!aex) {
-            aex = Math.floor(new Date().getTime() / 1000) + 60 * 60 * 24 * 365;
+            aex = TimeUtil.getNowUnixTimeStamp() + 60 * 60 * 24 * 365;
         }
 
         return {
             refreshToken: jwt.sign(
                 {
                     sub: user.id,
-                    iat: Math.floor(new Date().getTime() / 1000),
+                    iat: TimeUtil.getNowUnixTimeStamp(),
                     aex: aex,
                 },
                 { expiresIn: "14d" }
@@ -48,7 +49,7 @@ export default class AuthService {
             accessToken: jwt.sign(
                 {
                     sub: user.id,
-                    iat: Math.floor(new Date().getTime() / 1000),
+                    iat: TimeUtil.getNowUnixTimeStamp(),
                     aex: aex,
                 },
                 { expiresIn: "10m" }

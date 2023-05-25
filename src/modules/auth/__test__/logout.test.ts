@@ -1,5 +1,6 @@
 import { prisma } from "../../../plugins/prisma";
 import { hashSync } from "bcrypt";
+import TimeUtil from "../../../utils/time";
 
 describe("POST /api/auth/logout", () => {
     beforeEach(async () => {
@@ -23,8 +24,8 @@ describe("POST /api/auth/logout", () => {
                 refreshToken: fastify.jwt.sign(
                     {
                         sub: user.id,
-                        iat: Math.floor(new Date().getTime() / 1000),
-                        aex: Math.floor(new Date().getTime() / 1000) + 60,
+                        iat: TimeUtil.getNowUnixTimeStamp(),
+                        aex: TimeUtil.getNowUnixTimeStamp() + 60,
                     },
                     { expiresIn: "1d" }
                 ),

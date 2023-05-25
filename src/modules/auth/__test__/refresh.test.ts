@@ -1,6 +1,7 @@
 import { hashSync } from "bcrypt";
 import { prisma } from "../../../plugins/prisma";
 import { FastifyJWT } from "@fastify/jwt";
+import TimeUtil from "../../../utils/time";
 
 describe("POST /api/auth/refresh", () => {
     beforeEach(async () => {
@@ -16,7 +17,7 @@ describe("POST /api/auth/refresh", () => {
             },
         });
 
-        const aex = Math.floor(new Date().getTime() / 1000) + 60;
+        const aex = TimeUtil.getNowUnixTimeStamp() + 60;
 
         const response = await global.fastify.inject({
             method: "POST",
@@ -25,7 +26,7 @@ describe("POST /api/auth/refresh", () => {
                 refreshToken: fastify.jwt.sign(
                     {
                         sub: user.id,
-                        iat: Math.floor(new Date().getTime() / 1000),
+                        iat: TimeUtil.getNowUnixTimeStamp(),
                         aex: aex,
                     },
                     { expiresIn: "1d" }
@@ -66,8 +67,8 @@ describe("POST /api/auth/refresh", () => {
                 refreshToken: fastify.jwt.sign(
                     {
                         sub: 123,
-                        iat: Math.floor(new Date().getTime() / 1000),
-                        aex: Math.floor(new Date().getTime() / 1000) + 60,
+                        iat: TimeUtil.getNowUnixTimeStamp(),
+                        aex: TimeUtil.getNowUnixTimeStamp() + 60,
                     },
                     { expiresIn: "1d" }
                 ),
@@ -98,8 +99,8 @@ describe("POST /api/auth/refresh", () => {
                 refreshToken: fastify.jwt.sign(
                     {
                         sub: user.id,
-                        iat: Math.floor(new Date().getTime() / 1000) - 60,
-                        aex: Math.floor(new Date().getTime() / 1000) - 30,
+                        iat: TimeUtil.getNowUnixTimeStamp() - 60,
+                        aex: TimeUtil.getNowUnixTimeStamp() - 30,
                     },
                     { expiresIn: "1d" }
                 ),

@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import fastifyPlugin from "fastify-plugin";
 import fastifyJwt, { FastifyJWT, JWT } from "@fastify/jwt";
+import TimeUtil from "../utils/time";
 
 declare module "fastify" {
     interface FastifyRequest {
@@ -35,7 +36,7 @@ export default fastifyPlugin(
             ) => {
                 const token = decodedToken as FastifyJWT["user"];
 
-                return token.aex > Math.floor(new Date().getTime() / 1000);
+                return token.aex > TimeUtil.getNowUnixTimeStamp();
             },
         });
 
