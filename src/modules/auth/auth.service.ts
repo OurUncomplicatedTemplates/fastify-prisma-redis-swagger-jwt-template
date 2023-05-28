@@ -1,59 +1,122 @@
-import { JWT } from "@fastify/jwt";
-import { User } from "@prisma/client";
-import { hashSync } from "bcrypt";
+import { compareSync } from "bcrypt";
 import { prisma } from "../../plugins/prisma";
-import { CreateUserInput } from "./auth.schema";
+import { jwt } from "../../plugins/jwt";
 import TimeUtil from "../../utils/time";
+import { v4 } from "uuid";
 
 export default class AuthService {
-    async createUser(input: CreateUserInput) {
-        if (await this.getUserByEmail(input.email)) {
-            throw Error("Email is already in use");
-        }
+    public verifyPassword(userPassword: string, password: string): boolean {
+        return compareSync(password, userPassword);
+    }
 
-        return await prisma.user.create({
+    private createAccessToken(oldRefreshToken: string): string {
+        const refreshTokenObject = jwt.decodeRefreshToken(oldRefreshToken);
+
+        return jwt.signAccessToken({
+            sub: refreshTokenObject.sub,
+            iat: TimeUtil.getNowUnixTimeStamp(),
+        });
+    }
+
+    private async createRefreshToken(userId: number): Promise<string> {
+        const tokenFamily = v4();
+
+        const refreshToken = jwt.signRefreshToken({
+            sub: userId,
+            iat: TimeUtil.getNowUnixTimeStamp(),
+            aex: TimeUtil.getNowUnixTimeStamp() + 60 * 60 * 24 * 365,
+            tokenFamily: tokenFamily,
+        });
+
+        await prisma.userSession.create({
             data: {
-                email: input.email,
-                password: hashSync(input.password, 10),
-                name: input.name,
+                refreshToken: refreshToken,
+                tokenFamily: tokenFamily,
+                userId: userId,
             },
         });
+
+        return refreshToken;
     }
 
-    async getUserByEmail(email: string) {
-        return await prisma.user.findFirst({
-            where: { email: email },
+    private async createRefreshTokenByRefreshToken(
+        oldRefreshToken: string
+    ): Promise<string> {
+        const oldRefreshTokenObject = jwt.decodeRefreshToken(oldRefreshToken);
+
+        const refreshToken = jwt.signRefreshToken({
+            sub: oldRefreshTokenObject.sub,
+            iat: TimeUtil.getNowUnixTimeStamp(),
+            aex: oldRefreshTokenObject.aex,
+            tokenFamily: oldRefreshTokenObject.tokenFamily,
         });
-    }
 
-    async getUserById(id: number) {
-        return await prisma.user.findFirst({
-            where: { id: id },
+        await prisma.userSession.update({
+            where: {
+                tokenFamily: oldRefreshTokenObject.tokenFamily,
+            },
+            data: {
+                refreshToken: refreshToken,
+            },
         });
+
+        return refreshToken;
     }
 
-    createTokens(user: User, jwt: JWT, aex: number | null = null) {
-        if (!aex) {
-            aex = TimeUtil.getNowUnixTimeStamp() + 60 * 60 * 24 * 365;
-        }
+    public async createTokens(
+        userId: number
+    ): Promise<{ refreshToken: string; accessToken: string }> {
+        const refreshToken = await this.createRefreshToken(userId);
+        const accessToken = this.createAccessToken(refreshToken);
 
         return {
-            refreshToken: jwt.sign(
-                {
-                    sub: user.id,
-                    iat: TimeUtil.getNowUnixTimeStamp(),
-                    aex: aex,
+            refreshToken: refreshToken,
+            accessToken: accessToken,
+        };
+    }
+
+    public async refreshByToken(
+        oldRefreshToken: string
+    ): Promise<{ refreshToken: string; accessToken: string }> {
+        jwt.verify(oldRefreshToken);
+
+        const oldRefreshTokenObject = jwt.decodeRefreshToken(oldRefreshToken);
+
+        if (oldRefreshTokenObject.aex < TimeUtil.getNowUnixTimeStamp()) {
+            await prisma.userSession.delete({
+                where: {
+                    tokenFamily: oldRefreshTokenObject.tokenFamily,
                 },
-                { expiresIn: "14d" }
-            ),
-            accessToken: jwt.sign(
-                {
-                    sub: user.id,
-                    iat: TimeUtil.getNowUnixTimeStamp(),
-                    aex: aex,
+            });
+
+            throw new Error("Refresh token has reached absolute expiry");
+        }
+
+        const userSession = await prisma.userSession.findFirst({
+            where: {
+                refreshToken: oldRefreshToken,
+                userId: oldRefreshTokenObject.sub,
+            },
+        });
+
+        if (!userSession) {
+            await prisma.userSession.delete({
+                where: {
+                    tokenFamily: oldRefreshTokenObject.tokenFamily,
                 },
-                { expiresIn: "10m" }
-            ),
+            });
+
+            throw new Error("Refresh token has already been used");
+        }
+
+        const refreshToken = await this.createRefreshTokenByRefreshToken(
+            oldRefreshToken
+        );
+        const accessToken = this.createAccessToken(refreshToken);
+
+        return {
+            refreshToken: refreshToken,
+            accessToken: accessToken,
         };
     }
 }

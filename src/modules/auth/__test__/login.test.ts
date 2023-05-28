@@ -1,14 +1,20 @@
-import { prisma } from "../../../plugins/prisma";
-import { hashSync } from "bcrypt";
+import { User } from "@prisma/client";
+import { jwt } from "../../../plugins/jwt";
+import UserService from "../user.service";
 
 describe("POST /api/auth/login", () => {
+    let userService: UserService;
+
+    let user: User;
+    const userPassword = "1234";
+
     beforeAll(async () => {
-        await prisma.user.create({
-            data: {
-                name: "Joe Biden the 1st",
-                email: "joe@biden.com",
-                password: hashSync("1234", 10),
-            },
+        userService = new UserService();
+
+        user = await userService.createUser({
+            name: "Joe Biden the 1st",
+            email: "joe@biden.com",
+            password: userPassword,
         });
     });
 
@@ -17,15 +23,15 @@ describe("POST /api/auth/login", () => {
             method: "POST",
             url: "/api/auth/login",
             payload: {
-                email: "joe@biden.com",
-                password: "1234",
+                email: user.email,
+                password: userPassword,
             },
         });
 
         const refreshToken: { value: string } = response.cookies[0];
 
         expect(response.statusCode).toBe(200);
-        expect(fastify.jwt.verify(refreshToken.value)).toBeTruthy();
+        expect(jwt.verify(refreshToken.value)).toBeTruthy();
         expect(refreshToken).toEqual({
             httpOnly: true,
             name: "refreshToken",
@@ -34,7 +40,7 @@ describe("POST /api/auth/login", () => {
             secure: true,
             value: expect.any(String),
         });
-        expect(fastify.jwt.verify(response.json().accessToken)).toBeTruthy();
+        expect(jwt.verify(response.json().accessToken)).toBeTruthy();
     });
 
     it("should return status 401, when password is incorrect", async () => {
@@ -42,8 +48,8 @@ describe("POST /api/auth/login", () => {
             method: "POST",
             url: "/api/auth/login",
             payload: {
-                email: "joe@biden.com",
-                password: "wrong password",
+                email: user.email,
+                password: userPassword + "1",
             },
         });
 
@@ -60,8 +66,8 @@ describe("POST /api/auth/login", () => {
             method: "POST",
             url: "/api/auth/login",
             payload: {
-                email: "hunter@biden.com",
-                password: "1234",
+                email: "1" + user.email,
+                password: userPassword,
             },
         });
 
@@ -93,7 +99,7 @@ describe("POST /api/auth/login", () => {
             method: "POST",
             url: "/api/auth/login",
             payload: {
-                password: "1234",
+                password: userPassword,
             },
         });
 
@@ -110,7 +116,7 @@ describe("POST /api/auth/login", () => {
             method: "POST",
             url: "/api/auth/login",
             payload: {
-                email: "joe@biden.com",
+                email: user.email,
             },
         });
 

@@ -1,6 +1,14 @@
 name: Test
-on: [push]
+on:
+    push:
+        branches:
+            - master
+    pull_request:
+        branches:
+            - master
 permissions:
+    checks: write
+    pull-requests: write
     contents: write
 jobs:
     test:
@@ -42,7 +50,12 @@ jobs:
             - name: Run tests
               run: npm run test -- --coverage
 
+            - name: Comment coverage report on pull request
+              if: ${{ github.event_name == 'pull_request' }}
+              uses: ArtiomTr/jest-coverage-report-action@v2
+
             - name: Generate coverage badge
+              if: ${{ github.ref == 'refs/heads/master' }}
               uses: jaywcjlove/coverage-badges-cli@main
               with:
                   source: coverage/coverage-summary.json

@@ -1,7 +1,22 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import fastifyPlugin from "fastify-plugin";
-import fastifyJwt, { FastifyJWT, JWT } from "@fastify/jwt";
-import TimeUtil from "../utils/time";
+import fastifyJwt, { JWT } from "@fastify/jwt";
+
+type tokenPayload = {
+    sub: number;
+    iat: number;
+};
+
+type refreshTokenPayload = {
+    aex: number;
+    tokenFamily: string;
+} & tokenPayload;
+
+type accessTokenPayload = object & tokenPayload;
+
+type user = {
+    exp: number;
+} & tokenPayload;
 
 declare module "fastify" {
     interface FastifyRequest {
@@ -17,10 +32,19 @@ declare module "fastify" {
 
 declare module "@fastify/jwt" {
     interface FastifyJWT {
-        payload: { sub: number; iat: number; aex: number };
-        user: { sub: number; iat: number; exp: number; aex: number };
+        payload: refreshTokenPayload | accessTokenPayload;
+        user: user;
+    }
+
+    interface JWT {
+        signRefreshToken: (refreshTokenPayload: refreshTokenPayload) => string;
+        decodeRefreshToken: (refreshToken: string) => refreshTokenPayload;
+
+        signAccessToken: (accessTokenPayload: accessTokenPayload) => string;
     }
 }
+
+export let jwt: JWT;
 
 export default fastifyPlugin(
     async (fastify: FastifyInstance) => {
@@ -30,27 +54,32 @@ export default fastifyPlugin(
                 cookieName: "refreshToken",
                 signed: false,
             },
-            trusted: (
-                request: FastifyRequest,
-                decodedToken: { [k: string]: unknown }
-            ) => {
-                const token = decodedToken as FastifyJWT["user"];
-
-                return token.aex > TimeUtil.getNowUnixTimeStamp();
-            },
         });
 
-        fastify.addHook("preHandler", (req, reply, next) => {
-            req.jwt = fastify.jwt;
-            return next();
-        });
+        jwt = fastify.jwt;
+
+        jwt.signRefreshToken = (refreshTokenPayload: refreshTokenPayload) => {
+            return jwt.sign(refreshTokenPayload, { expiresIn: "14d" });
+        };
+
+        jwt.decodeRefreshToken = (refreshToken: string) => {
+            const refreshTokenObject = jwt.decode<refreshTokenPayload>(
+                refreshToken
+            ) as refreshTokenPayload;
+
+            return refreshTokenObject;
+        };
+
+        jwt.signAccessToken = (accessTokenPayload: accessTokenPayload) => {
+            return jwt.sign(accessTokenPayload, { expiresIn: "10m" });
+        };
 
         fastify.decorate(
             "authenticate",
             async (request: FastifyRequest, reply: FastifyReply) => {
                 try {
                     await request.jwtVerify();
-                } catch (err) {
+                } catch (e) {
                     reply.unauthorized();
                 }
             }
