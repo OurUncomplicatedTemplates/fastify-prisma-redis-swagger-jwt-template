@@ -1,7 +1,7 @@
 import { User } from "@prisma/client";
 import { v4 } from "uuid";
 import { prisma } from "../../../plugins/prisma";
-import { jwt, token } from "../../../plugins/jwt";
+import { jwt } from "../../../plugins/jwt";
 import TimeUtil from "../../../utils/time";
 import AuthService from "../auth.service";
 import UserService from "../user.service";
@@ -38,13 +38,13 @@ describe("POST /api/auth/refresh", () => {
             },
         });
 
-        const oldRefreshTokenPayload = jwt.decode<token>(refreshToken) as token;
+        const oldRefreshTokenPayload = jwt.decodeRefreshToken(refreshToken);
         const newRefreshToken = response.cookies[0];
 
         // Refresh token
         expect(response.statusCode).toBe(200);
         expect(jwt.verify(newRefreshToken.value)).toBeTruthy();
-        expect(jwt.decode<token>(newRefreshToken.value)?.aex).toBe(
+        expect(jwt.decodeRefreshToken(newRefreshToken.value).aex).toBe(
             oldRefreshTokenPayload.aex
         );
         expect(newRefreshToken).toEqual({
@@ -58,9 +58,6 @@ describe("POST /api/auth/refresh", () => {
 
         // Access token
         expect(jwt.verify(response.json().accessToken)).toBeTruthy();
-        expect(jwt.decode<token>(response.json().accessToken)?.aex).toBe(
-            oldRefreshTokenPayload.aex
-        );
     });
 
     it("should return status 401, when using refreshToken that has already been used", async () => {
@@ -124,15 +121,12 @@ describe("POST /api/auth/refresh", () => {
     it("should return status 401, refreshToken absolute expiry is passed", async () => {
         const tokenFamily = v4();
 
-        const refreshToken = jwt.sign(
-            {
-                sub: user.id,
-                iat: TimeUtil.getNowUnixTimeStamp() - 60,
-                aex: TimeUtil.getNowUnixTimeStamp() - 30,
-                tokenFamily: tokenFamily,
-            },
-            { expiresIn: "1d" }
-        );
+        const refreshToken = jwt.signRefreshToken({
+            sub: user.id,
+            iat: TimeUtil.getNowUnixTimeStamp() - 60,
+            aex: TimeUtil.getNowUnixTimeStamp() - 30,
+            tokenFamily: tokenFamily,
+        });
 
         await prisma.userSession.create({
             data: {
@@ -141,6 +135,29 @@ describe("POST /api/auth/refresh", () => {
                 tokenFamily: tokenFamily,
             },
         });
+
+        const response = await global.fastify.inject({
+            method: "POST",
+            url: "/api/auth/refresh",
+            cookies: {
+                refreshToken: refreshToken,
+            },
+        });
+
+        expect(response.statusCode).toBe(401);
+        expect(response.json()).toMatchObject({
+            error: "Unauthorized",
+            message: "Unauthorized",
+            statusCode: 401,
+        });
+    });
+
+    it("should return status 401, refreshToken expired", async () => {
+        jest.useFakeTimers({
+            now: Date.now() - 1000 * 60 * 60 * 24 * 14 - 1000,
+        });
+        const { refreshToken } = await authService.createTokens(user.id);
+        jest.useRealTimers();
 
         const response = await global.fastify.inject({
             method: "POST",
@@ -180,15 +197,12 @@ describe("POST /api/auth/refresh", () => {
             method: "POST",
             url: "/api/auth/refresh",
             cookies: {
-                refreshToken: jwt.sign(
-                    {
-                        sub: 542,
-                        iat: TimeUtil.getNowUnixTimeStamp(),
-                        aex: TimeUtil.getNowUnixTimeStamp() + 60,
-                        tokenFamily: v4(),
-                    },
-                    { expiresIn: "10m" }
-                ),
+                refreshToken: jwt.signRefreshToken({
+                    sub: 542,
+                    iat: TimeUtil.getNowUnixTimeStamp(),
+                    aex: TimeUtil.getNowUnixTimeStamp() + 60,
+                    tokenFamily: v4(),
+                }),
             },
         });
 

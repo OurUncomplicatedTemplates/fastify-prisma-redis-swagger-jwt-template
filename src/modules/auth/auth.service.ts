@@ -1,6 +1,6 @@
 import { compareSync } from "bcrypt";
 import { prisma } from "../../plugins/prisma";
-import { jwt, token } from "../../plugins/jwt";
+import { jwt } from "../../plugins/jwt";
 import TimeUtil from "../../utils/time";
 import { v4 } from "uuid";
 
@@ -10,34 +10,23 @@ export default class AuthService {
     }
 
     private createAccessToken(oldRefreshToken: string): string {
-        const refreshTokenObject = jwt.decode<token>(oldRefreshToken) as token;
+        const refreshTokenObject = jwt.decodeRefreshToken(oldRefreshToken);
 
-        return jwt.sign(
-            {
-                sub: refreshTokenObject.sub,
-                iat: TimeUtil.getNowUnixTimeStamp(),
-                aex: refreshTokenObject.aex,
-                tokenFamily: refreshTokenObject.tokenFamily,
-            },
-            { expiresIn: "10m" }
-        );
+        return jwt.signAccessToken({
+            sub: refreshTokenObject.sub,
+            iat: TimeUtil.getNowUnixTimeStamp(),
+        });
     }
 
-    private async createRefreshToken(
-        userId: number,
-        aex: number
-    ): Promise<string> {
+    private async createRefreshToken(userId: number): Promise<string> {
         const tokenFamily = v4();
 
-        const refreshToken = jwt.sign(
-            {
-                sub: userId,
-                iat: TimeUtil.getNowUnixTimeStamp(),
-                aex: aex,
-                tokenFamily: tokenFamily,
-            },
-            { expiresIn: "14d" }
-        );
+        const refreshToken = jwt.signRefreshToken({
+            sub: userId,
+            iat: TimeUtil.getNowUnixTimeStamp(),
+            aex: TimeUtil.getNowUnixTimeStamp() + 60 * 60 * 24 * 365,
+            tokenFamily: tokenFamily,
+        });
 
         await prisma.userSession.create({
             data: {
@@ -53,34 +42,20 @@ export default class AuthService {
     private async createRefreshTokenByRefreshToken(
         oldRefreshToken: string
     ): Promise<string> {
-        const oldRefreshTokenObject = jwt.decode<token>(
-            oldRefreshToken
-        ) as token;
+        const oldRefreshTokenObject = jwt.decodeRefreshToken(oldRefreshToken);
 
-        const refreshToken = jwt.sign(
-            {
-                sub: oldRefreshTokenObject.sub,
-                iat: TimeUtil.getNowUnixTimeStamp(),
-                aex: oldRefreshTokenObject.aex,
-                tokenFamily: oldRefreshTokenObject.tokenFamily,
-            },
-            { expiresIn: "14d" }
-        );
+        const refreshToken = jwt.signRefreshToken({
+            sub: oldRefreshTokenObject.sub,
+            iat: TimeUtil.getNowUnixTimeStamp(),
+            aex: oldRefreshTokenObject.aex,
+            tokenFamily: oldRefreshTokenObject.tokenFamily,
+        });
 
-        await prisma.userSession.upsert({
+        await prisma.userSession.update({
             where: {
                 tokenFamily: oldRefreshTokenObject.tokenFamily,
             },
-            create: {
-                refreshToken: refreshToken,
-                tokenFamily: oldRefreshTokenObject.tokenFamily,
-                user: {
-                    connect: {
-                        id: oldRefreshTokenObject.sub,
-                    },
-                },
-            },
-            update: {
+            data: {
                 refreshToken: refreshToken,
             },
         });
@@ -91,9 +66,7 @@ export default class AuthService {
     public async createTokens(
         userId: number
     ): Promise<{ refreshToken: string; accessToken: string }> {
-        const aex = TimeUtil.getNowUnixTimeStamp() + 60 * 60 * 24 * 365;
-
-        const refreshToken = await this.createRefreshToken(userId, aex);
+        const refreshToken = await this.createRefreshToken(userId);
         const accessToken = this.createAccessToken(refreshToken);
 
         return {
@@ -105,9 +78,9 @@ export default class AuthService {
     public async refreshByToken(
         oldRefreshToken: string
     ): Promise<{ refreshToken: string; accessToken: string }> {
-        const oldRefreshTokenObject = jwt.decode<token>(
-            oldRefreshToken
-        ) as token;
+        jwt.verify(oldRefreshToken);
+
+        const oldRefreshTokenObject = jwt.decodeRefreshToken(oldRefreshToken);
 
         if (oldRefreshTokenObject.aex < TimeUtil.getNowUnixTimeStamp()) {
             await prisma.userSession.delete({
@@ -127,24 +100,13 @@ export default class AuthService {
         });
 
         if (!userSession) {
-            const userSessionFromFamily = await prisma.userSession.findFirst({
+            await prisma.userSession.delete({
                 where: {
-                    userId: oldRefreshTokenObject.sub,
                     tokenFamily: oldRefreshTokenObject.tokenFamily,
                 },
             });
 
-            if (userSessionFromFamily) {
-                await prisma.userSession.delete({
-                    where: {
-                        tokenFamily: oldRefreshTokenObject.tokenFamily,
-                    },
-                });
-
-                throw new Error("Refresh token has already been used");
-            }
-
-            throw new Error("Refresh token not found");
+            throw new Error("Refresh token has already been used");
         }
 
         const refreshToken = await this.createRefreshTokenByRefreshToken(

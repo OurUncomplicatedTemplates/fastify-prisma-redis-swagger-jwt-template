@@ -1,5 +1,4 @@
 import { User } from "@prisma/client";
-import { v4 } from "uuid";
 import { jwt } from "../../../plugins/jwt";
 import TimeUtil from "../../../utils/time";
 import UserService from "../user.service";
@@ -47,15 +46,10 @@ describe("GET /api/auth/user", () => {
             headers: {
                 authorization:
                     "Bearer " +
-                    jwt.sign(
-                        {
-                            sub: 542,
-                            iat: TimeUtil.getNowUnixTimeStamp(),
-                            aex: TimeUtil.getNowUnixTimeStamp() + 60,
-                            tokenFamily: v4(),
-                        },
-                        { expiresIn: "10m" }
-                    ),
+                    jwt.signAccessToken({
+                        sub: 542,
+                        iat: TimeUtil.getNowUnixTimeStamp(),
+                    }),
             },
         });
 
