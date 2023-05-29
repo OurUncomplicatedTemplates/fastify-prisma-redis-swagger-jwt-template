@@ -5,9 +5,9 @@
     "main": "src/server.ts",
     "scripts": {
         "test": "jest --bail",
-        "build": "tsc -p tsconfig.build.json",
-        "vercel-build": "prisma generate",
-        "start": "node build/server.js",
+        "build": "rm -rf build && tsc -p tsconfig.build.json",
+        "vercel-build": "prisma generate && npm run build",
+        "start": "node build/src/server.js",
         "lint": "eslint src",
         "dev": "tsnd --respawn --transpile-only --exit-child src/server.ts",
         "migrate:dev": "prisma migrate dev"
