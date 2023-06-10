@@ -13,7 +13,7 @@ declare module "fastify" {
             HOST: string;
             PORT: number;
             DATABASE_URL: string;
-            REDIS_URL: string | undefined;
+            REDIS_URL: string;
             REDIS_HOST: string | undefined;
             REDIS_PORT: number | undefined;
             REDIS_USER: string | undefined;
