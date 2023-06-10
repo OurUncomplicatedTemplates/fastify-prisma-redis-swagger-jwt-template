@@ -32,11 +32,7 @@ export let redis: Redis;
 
 export default fastifyPlugin(
     async (fastify: FastifyInstance) => {
-        redis = new Redis({
-            host: fastify.config.REDIS_HOST,
-            port: fastify.config.REDIS_PORT,
-            username: fastify.config.REDIS_USER,
-            password: fastify.config.REDIS_PASSWORD,
+        redis = new Redis(fastify.config.REDIS_URL, {
             keyPrefix:
                 fastify.config.NODE_ENV === "test"
                     ? /* istanbul ignore next */ v4()
