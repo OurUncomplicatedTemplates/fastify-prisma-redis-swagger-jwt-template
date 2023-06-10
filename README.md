@@ -10,7 +10,7 @@ Open [http://localhost:3000/api/docs](http://localhost:3000/api/docs) to view it
 
 In the project directory, you can run:
 
-### `make dev`
+### `make dev` 
 
 To start the app in dev mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
