@@ -2,6 +2,10 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import AuthService from "./auth.service";
 import UserService from "./user.service";
 import { CreateUserInput, LoginInput } from "./auth.schema";
+import {User} from "@prisma/client";
+
+const CACHE_TTL = 1800;
+const CACHE_KEY_USER = "user";
 
 export default class AuthController {
     private authService: AuthService;
@@ -108,10 +112,16 @@ export default class AuthController {
 
     public async userHandler(request: FastifyRequest, reply: FastifyReply) {
         try {
-            const user = await this.userService.getUserById(request.user.sub);
-
+            const user = await request.redis.rememberJSON<User>(
+                CACHE_KEY_USER + request.user.sub,
+                CACHE_TTL,
+                async () => {
+                    return await this.userService.getUserById(request.user.sub);
+                }
+            );
             return reply.code(200).send(user);
         } catch (e) {
+            console.log(e);
             return reply.unauthorized();
         }
     }

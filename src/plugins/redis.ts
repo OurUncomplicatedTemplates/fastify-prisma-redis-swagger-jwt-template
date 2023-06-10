@@ -34,9 +34,9 @@ export default fastifyPlugin(
     async (fastify: FastifyInstance) => {
         redis = new Redis(fastify.config.REDIS_URL, {
             keyPrefix:
-                fastify.config.NODE_ENV === "test"
-                    ? /* istanbul ignore next */ v4()
-                    : /* istanbul ignore next */ undefined,
+            fastify.config.NODE_ENV === "test"
+                ? /* istanbul ignore next */ v4()
+                : /* istanbul ignore next */ undefined,
         });
 
         redis.remember = async (key, ttl, callback) => {
