@@ -10,9 +10,13 @@ if (!process.env.DATABASE_URL_WITHOUT_SCHEMA) {
     throw new Error("env variable DATABASE_URL_WITHOUT_SCHEMA is not set");
 }
 
-const schemaId = `test-${v4()}`;
+const schemaId = `test${v4().replaceAll("-", "")}`;
+
+const currentDatabaseName = process.env.DATABASE_NAME;
 
 process.env.DATABASE_URL =
+    process.env.DATABASE_URL_WITHOUT_SCHEMA + "/" + schemaId;
+process.env.DATABASE_URL_NON_POOLING =
     process.env.DATABASE_URL_WITHOUT_SCHEMA + "/" + schemaId;
 
 beforeAll(() => {
@@ -30,13 +34,24 @@ beforeAll(() => {
         env: {
             ...process.env,
             DATABASE_URL: process.env.DATABASE_URL,
+            DATABASE_URL_NON_POOLING: process.env.DATABASE_URL_NON_POOLING,
         },
     });
 });
 
 afterAll(async () => {
-    await prisma.$executeRawUnsafe(`DROP DATABASE IF EXISTS \`${schemaId}\`;`);
     await prisma.$disconnect();
+
+    process.env.DATABASE_URL =
+        process.env.DATABASE_URL_WITHOUT_SCHEMA + "/" + currentDatabaseName;
+    process.env.DATABASE_URL_NON_POOLING =
+        process.env.DATABASE_URL_WITHOUT_SCHEMA + "/" + currentDatabaseName;
+
+    const prismaCurrent = new PrismaClient({
+        datasources: { db: { url: process.env.DATABASE_URL } },
+    });
+
+    await prismaCurrent.$executeRawUnsafe(`DROP DATABASE IF EXISTS ${schemaId};`);
 });
 
 export const prisma = new PrismaClient({

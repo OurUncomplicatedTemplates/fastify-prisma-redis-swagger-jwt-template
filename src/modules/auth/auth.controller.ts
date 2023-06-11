@@ -121,7 +121,6 @@ export default class AuthController {
             );
             return reply.code(200).send(user);
         } catch (e) {
-            console.log(e);
             return reply.unauthorized();
         }
     }

@@ -13,6 +13,7 @@ declare module "fastify" {
             HOST: string;
             PORT: number;
             DATABASE_URL: string;
+            DATABASE_URL_NON_POOLING: string;
             REDIS_URL: string;
             NODE_ENV: NODE_ENV;
         };
@@ -27,7 +28,7 @@ export default fastifyPlugin(
     ) => {
         const schema = {
             type: "object",
-            required: ["SECRET", "DATABASE_URL", "REDIS_URL"],
+            required: ["SECRET", "DATABASE_URL", "DATABASE_URL_NON_POOLING", "REDIS_URL"],
             properties: {
                 SECRET: {
                     type: "string",
@@ -41,6 +42,9 @@ export default fastifyPlugin(
                     default: 3000,
                 },
                 DATABASE_URL: {
+                    type: "string",
+                },
+                DATABASE_URL_NON_POOLING: {
                     type: "string",
                 },
                 REDIS_URL: {
