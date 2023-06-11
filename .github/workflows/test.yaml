@@ -21,21 +21,27 @@ jobs:
                 image: postgres
                 # Provide the password for postgres
                 env:
-                    POSTGRES_PASSWORD: password
-                # Set health checks to wait until postgres has started
-
+                    # optional (defaults to `postgres`)
+                    POSTGRES_DB: postgres_db
+                    # required
+                    POSTGRES_PASSWORD: postgres_password
+                    # optional (defaults to `5432`)
+                    POSTGRES_PORT: 5432
+                    # optional (defaults to `postgres`)
+                    POSTGRES_USER: postgres_user
                 ports:
                     # maps tcp port 5432 on service container to the host
                     - 5432:5432
+                # Set health checks to wait until postgres has started
                 options: >-
                     --health-cmd pg_isready
                     --health-interval 10s
                     --health-timeout 5s
                     --health-retries 5
         env:
-            DATABASE_URL: "postgresql://postgres:password@postgres:5432/postgres"
-            DATABASE_URL_NON_POOLING: "postgresql://postgres:password@postgres:5432/postgres"
-            DATABASE_URL_WITHOUT_SCHEMA: "postgresql://postgres:password@postgres:5432"
+            DATABASE_URL: "postgresql://postgres_user:postgres_password@postgres:5432/postgres_db"
+            DATABASE_URL_NON_POOLING: "postgresql://postgres_user:postgres_password@postgres:5432/postgres_db"
+            DATABASE_URL_WITHOUT_SCHEMA: "postgresql://postgres_user:postgres_password@postgres:5432"
             REDIS_URL: "redis://localhost"
             SECRET: "7ZB68E3HZ9HWGe8FzUvNWZcoYD9uuwkp25Y66S6RkszKadFMJCj9ShXL7TBcieG9yoRAsdTKzJcEgQUYbd6dtjXgmZMQhVNKypNeq6yKKLVht7gUtXypaoxgoRjQDHLceCWmJhM6GbwYiyLHmVYA8L9zuJUhYW2atZiv4Fxoc4YqzaCCrSZxzPBT9rFDSCtHsXXDEShMvULSStZvwt26tesWtxEMx5Q43a3s6eHrPJUPgVX3aAZsmYRu3bzCHvRp"
         steps:
