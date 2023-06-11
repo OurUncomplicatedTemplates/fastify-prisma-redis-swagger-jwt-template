@@ -10,7 +10,7 @@ if (!process.env.DATABASE_URL_WITHOUT_SCHEMA) {
     throw new Error("env variable DATABASE_URL_WITHOUT_SCHEMA is not set");
 }
 
-const schemaId = `test${v4().replaceAll("-", "")}`;
+const schemaId = `test${v4().replace(/(-)/g, '') }`;
 
 const currentDatabaseName = process.env.DATABASE_NAME;
 
