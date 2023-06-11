@@ -51,7 +51,11 @@ afterAll(async () => {
         datasources: { db: { url: process.env.DATABASE_URL } },
     });
 
-    await prismaCurrent.$executeRawUnsafe(`DROP DATABASE IF EXISTS ${schemaId};`);
+    try {
+        await prismaCurrent.$executeRawUnsafe(`DROP DATABASE IF EXISTS ${schemaId};`);
+    } catch (error) {
+        // Too Bad!
+    }
 });
 
 export const prisma = new PrismaClient({
