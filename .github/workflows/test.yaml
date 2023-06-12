@@ -14,19 +14,38 @@ jobs:
     test:
         concurrency: ci-${{ github.ref }}
         runs-on: ubuntu-latest
+        services:
+            # Label used to access the service container
+            postgres:
+                # Docker Hub image
+                image: postgres
+                # Provide the password for postgres
+                env:
+                    # optional (defaults to `postgres`)
+                    POSTGRES_DB: postgres_db
+                    # required
+                    POSTGRES_PASSWORD: postgres_password
+                    # optional (defaults to `5432`)
+                    POSTGRES_PORT: 5432
+                    # optional (defaults to `postgres`)
+                    POSTGRES_USER: postgres_user
+                ports:
+                    # maps tcp port 5432 on service container to the host
+                    - 5432:5432
+                # Set health checks to wait until postgres has started
+                options: >-
+                    --health-cmd pg_isready
+                    --health-interval 10s
+                    --health-timeout 5s
+                    --health-retries 5
         env:
-            DATABASE_URL: "mysql://root:password@localhost:3306/db"
-            DATABASE_URL_WITHOUT_SCHEMA: "mysql://root:password@localhost:3306"
-            REDIS_HOST: "localhost"
+            DATABASE_URL: "postgresql://postgres_user:postgres_password@localhost:5432/postgres_db"
+            DATABASE_URL_NON_POOLING: "postgresql://postgres_user:postgres_password@localhost:5432/postgres_db"
+            DATABASE_URL_WITHOUT_SCHEMA: "postgresql://postgres_user:postgres_password@localhost:5432"
+            REDIS_URL: "redis://localhost"
             SECRET: "7ZB68E3HZ9HWGe8FzUvNWZcoYD9uuwkp25Y66S6RkszKadFMJCj9ShXL7TBcieG9yoRAsdTKzJcEgQUYbd6dtjXgmZMQhVNKypNeq6yKKLVht7gUtXypaoxgoRjQDHLceCWmJhM6GbwYiyLHmVYA8L9zuJUhYW2atZiv4Fxoc4YqzaCCrSZxzPBT9rFDSCtHsXXDEShMvULSStZvwt26tesWtxEMx5Q43a3s6eHrPJUPgVX3aAZsmYRu3bzCHvRp"
         steps:
             - uses: actions/checkout@v3
-
-            - name: Setup MariaDB server
-              uses: getong/mariadb-action@v1.1
-              with:
-                  mysql database: "db"
-                  mysql root password: "password"
 
             - name: Setup Redis server
               uses: supercharge/redis-github-action@1.4.0
