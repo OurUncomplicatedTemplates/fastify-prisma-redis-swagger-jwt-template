@@ -1,6 +1,6 @@
 # Project
 
-[![Coverage Status](https://frederikpyt.github.io/fastify-prisma-redis-swagger-jwt-template/badge.svg)](https://frederikpyt.github.io/fastify-prisma-redis-swagger-jwt-template)
+[![Coverage Status](https://raw.githubusercontent.com/OurUncomplicatedTemplates/fastify-prisma-redis-swagger-jwt-template/gh-pages/badge.svg)](https://htmlpreview.github.io/?https://github.com/OurUncomplicatedTemplates/fastify-prisma-redis-swagger-jwt-template/blob/gh-pages/index.html)
 
 ## API documentation (Swagger)
 
