@@ -16,6 +16,7 @@ declare module "fastify" {
             DATABASE_URL_NON_POOLING: string;
             REDIS_URL: string;
             NODE_ENV: NODE_ENV;
+            ALLOWED_ORIGINS: string[];
         };
     }
 }
@@ -58,6 +59,11 @@ export default fastifyPlugin(
                 NODE_ENV: {
                     type: "string",
                     default: "prod",
+                },
+                ALLOWED_ORIGINS: {
+                    type: "string",
+                    separator: ",",
+                    default: "http://localhost:3000",
                 },
             },
         };
