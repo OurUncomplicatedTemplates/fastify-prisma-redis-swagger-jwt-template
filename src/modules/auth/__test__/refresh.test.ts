@@ -48,10 +48,13 @@ describe("POST /api/auth/refresh", () => {
             oldRefreshTokenPayload.aex
         );
         expect(newRefreshToken).toEqual({
+            expires: expect.toBeWithinOneMinuteOf(
+                new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
+            ),
             httpOnly: true,
             name: "refreshToken",
             path: "/api/auth/refresh",
-            sameSite: "Strict",
+            sameSite: "None",
             secure: true,
             value: expect.any(String),
         });

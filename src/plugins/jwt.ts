@@ -10,6 +10,7 @@ type tokenPayload = {
 type refreshTokenPayload = {
     aex: number;
     tokenFamily: string;
+    exp: number;
 } & tokenPayload;
 
 type accessTokenPayload = object & tokenPayload;

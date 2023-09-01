@@ -2,7 +2,7 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import AuthService from "./auth.service";
 import UserService from "./user.service";
 import { CreateUserInput, LoginInput } from "./auth.schema";
-import {User} from "@prisma/client";
+import { User } from "@prisma/client";
 
 const CACHE_TTL = 1800;
 const CACHE_KEY_USER = "user";
@@ -65,7 +65,10 @@ export default class AuthController {
                     path: "/api/auth/refresh",
                     secure: true,
                     httpOnly: true,
-                    sameSite: true,
+                    sameSite: "none",
+                    expires: new Date(
+                        fastify.jwt.decodeRefreshToken(refreshToken).exp * 1000
+                    ),
                 })
                 .send({
                     accessToken: accessToken,
@@ -88,7 +91,10 @@ export default class AuthController {
                     path: "/api/auth/refresh",
                     secure: true,
                     httpOnly: true,
-                    sameSite: true,
+                    sameSite: "none",
+                    expires: new Date(
+                        fastify.jwt.decodeRefreshToken(refreshToken).exp * 1000
+                    ),
                 })
                 .send({
                     accessToken: accessToken,
@@ -105,7 +111,7 @@ export default class AuthController {
                 path: "/api/auth/refresh",
                 secure: true,
                 httpOnly: true,
-                sameSite: true,
+                sameSite: "none",
             })
             .send();
     }

@@ -41,7 +41,7 @@ describe("POST /api/auth/logout", () => {
             httpOnly: true,
             name: "refreshToken",
             path: "/api/auth/refresh",
-            sameSite: "Strict",
+            sameSite: "None",
             secure: true,
             value: "",
         });
