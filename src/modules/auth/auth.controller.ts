@@ -56,7 +56,7 @@ export default class AuthController {
                 throw new Error("password incorrect");
             }
 
-            const { refreshToken, accessToken } =
+            const { refreshToken, refreshTokenPayload, accessToken } =
                 await this.authService.createTokens(user.id);
 
             return reply
@@ -66,9 +66,7 @@ export default class AuthController {
                     secure: true,
                     httpOnly: true,
                     sameSite: "none",
-                    expires: new Date(
-                        fastify.jwt.decodeRefreshToken(refreshToken).exp * 1000
-                    ),
+                    expires: new Date(refreshTokenPayload.exp * 1000),
                 })
                 .send({
                     accessToken: accessToken,
@@ -80,7 +78,7 @@ export default class AuthController {
 
     public async refreshHandler(request: FastifyRequest, reply: FastifyReply) {
         try {
-            const { refreshToken, accessToken } =
+            const { refreshToken, refreshTokenPayload, accessToken } =
                 await this.authService.refreshByToken(
                     request.cookies.refreshToken as string
                 );
@@ -92,9 +90,7 @@ export default class AuthController {
                     secure: true,
                     httpOnly: true,
                     sameSite: "none",
-                    expires: new Date(
-                        fastify.jwt.decodeRefreshToken(refreshToken).exp * 1000
-                    ),
+                    expires: new Date(refreshTokenPayload.exp * 1000),
                 })
                 .send({
                     accessToken: accessToken,
