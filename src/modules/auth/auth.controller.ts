@@ -101,6 +101,8 @@ export default class AuthController {
     }
 
     public async logoutHandler(request: FastifyRequest, reply: FastifyReply) {
+        await this.authService.deleteUserSessionByTokenFamily(request.user.tokenFamily)
+
         return reply
             .code(200)
             .clearCookie("refreshToken", {

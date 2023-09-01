@@ -61,6 +61,7 @@ export default async (fastify: FastifyInstance) => {
                     200: $ref("logoutResponseSchema"),
                 },
             },
+            onRequest: [fastify.authenticate],
         },
         authController.logoutHandler.bind(authController)
     );
