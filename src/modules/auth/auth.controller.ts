@@ -2,7 +2,7 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import AuthService from "./auth.service";
 import UserService from "./user.service";
 import { CreateUserInput, LoginInput } from "./auth.schema";
-import {User} from "@prisma/client";
+import { User } from "@prisma/client";
 
 const CACHE_TTL = 1800;
 const CACHE_KEY_USER = "user";
@@ -56,7 +56,7 @@ export default class AuthController {
                 throw new Error("password incorrect");
             }
 
-            const { refreshToken, accessToken } =
+            const { refreshToken, refreshTokenPayload, accessToken } =
                 await this.authService.createTokens(user.id);
 
             return reply
@@ -65,7 +65,8 @@ export default class AuthController {
                     path: "/api/auth/refresh",
                     secure: true,
                     httpOnly: true,
-                    sameSite: true,
+                    sameSite: "none",
+                    expires: new Date(refreshTokenPayload.exp * 1000),
                 })
                 .send({
                     accessToken: accessToken,
@@ -77,7 +78,7 @@ export default class AuthController {
 
     public async refreshHandler(request: FastifyRequest, reply: FastifyReply) {
         try {
-            const { refreshToken, accessToken } =
+            const { refreshToken, refreshTokenPayload, accessToken } =
                 await this.authService.refreshByToken(
                     request.cookies.refreshToken as string
                 );
@@ -88,7 +89,8 @@ export default class AuthController {
                     path: "/api/auth/refresh",
                     secure: true,
                     httpOnly: true,
-                    sameSite: true,
+                    sameSite: "none",
+                    expires: new Date(refreshTokenPayload.exp * 1000),
                 })
                 .send({
                     accessToken: accessToken,
@@ -105,7 +107,7 @@ export default class AuthController {
                 path: "/api/auth/refresh",
                 secure: true,
                 httpOnly: true,
-                sameSite: true,
+                sameSite: "none",
             })
             .send();
     }

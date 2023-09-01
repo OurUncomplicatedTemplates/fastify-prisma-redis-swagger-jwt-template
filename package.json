@@ -4,7 +4,7 @@
     "description": "This project is a fastify template",
     "main": "src/server.ts",
     "scripts": {
-        "test": "jest --bail",
+        "test": "jest",
         "build": "rm -rf build && tsc -p tsconfig.build.json",
         "vercel-build": "prisma generate && npm run build",
         "start": "node build/src/server.js",
