@@ -7,7 +7,7 @@ declare global {
     // eslint-disable-next-line @typescript-eslint/no-namespace
     namespace jest {
         interface Expect {
-            toBeWithinOneMinuteOf(expected: Date): any;
+            toBeWithinOneMinuteOf(expected: Date): unknown;
         }
         interface Matchers<R> {
             toBeWithinOneMinuteOf(expected: Date): R;
