@@ -63,7 +63,7 @@ export default fastifyPlugin(
                 ALLOWED_ORIGINS: {
                     type: "string",
                     separator: ",",
-                    default: "http://localhost:3000",
+                    default: "http://localhost:4321",
                 },
             },
         };
