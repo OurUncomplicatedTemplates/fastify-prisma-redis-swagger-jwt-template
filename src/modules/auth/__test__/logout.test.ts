@@ -1,7 +1,6 @@
 import { prisma } from "../../../plugins/prisma";
 import UserService from "../user.service";
 import AuthService from "../auth.service";
-import { jwt } from "../../../plugins/jwt";
 
 describe("POST /api/auth/logout", () => {
     let userService: UserService;
@@ -23,7 +22,7 @@ describe("POST /api/auth/logout", () => {
             password: "1234",
         });
 
-        const { refreshToken, accessToken } = await authService.createTokens(user.id);
+        const { refreshTokenPayload, accessToken } = await authService.createTokens(user.id);
 
         const response = await global.fastify.inject({
             method: "POST",
@@ -47,7 +46,6 @@ describe("POST /api/auth/logout", () => {
         });
 
         // Check that the refreshToken is actually deleted from the database
-        const refreshTokenPayload = jwt.decodeRefreshToken(refreshToken);
         const userSession = await prisma.userSession.findUnique({
             where: {
                 tokenFamily: refreshTokenPayload.tokenFamily,
@@ -64,11 +62,11 @@ describe("POST /api/auth/logout", () => {
             password: "1234",
         });
 
-        const { refreshToken, accessToken } = await authService.createTokens(user.id);
+        const { refreshTokenPayload, accessToken } = await authService.createTokens(user.id);
 
         await prisma.userSession.delete({
             where: {
-                tokenFamily: jwt.decodeRefreshToken(refreshToken).tokenFamily,
+                tokenFamily: refreshTokenPayload.tokenFamily,
             },
         });
 
@@ -105,8 +103,6 @@ describe("POST /api/auth/logout", () => {
             method: "POST",
             url: "/api/auth/logout",
         });
-
-        const refreshTokenCookie: { value: string } = response.cookies[0];
 
         expect(response.statusCode).toBe(401);
     });
