@@ -22,6 +22,7 @@ export default class AuthService {
         const accessToken = jwt.signAccessToken({
             sub: refreshTokenObject.sub,
             iat: TimeUtil.getNowUnixTimeStamp(),
+            tokenFamily: refreshTokenObject.tokenFamily,
         });
 
         return {
@@ -154,5 +155,13 @@ export default class AuthService {
             accessToken: accessToken,
             accessTokenPayload: accessTokenPayload,
         };
+    }
+
+    public async deleteUserSessionByTokenFamily(tokenFamily: string): Promise<void> {
+        await prisma.userSession.deleteMany({
+            where: {
+                tokenFamily: tokenFamily,
+            },
+        });
     }
 }

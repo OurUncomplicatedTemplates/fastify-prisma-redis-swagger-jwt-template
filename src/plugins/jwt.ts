@@ -8,12 +8,12 @@ export type tokenPayload = {
 export type signTokenPayload = {
     sub: number;
     iat: number;
+    tokenFamily: string;
 };
 
 export type refreshTokenPayload = tokenPayload & signRefreshTokenPayload;
 export type signRefreshTokenPayload = {
     aex: number;
-    tokenFamily: string;
 } & signTokenPayload;
 
 export type accessTokenPayload = tokenPayload & signAccessTokenPayload;
