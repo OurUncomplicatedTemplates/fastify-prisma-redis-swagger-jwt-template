@@ -1,6 +1,7 @@
 import { prisma } from "../../../plugins/prisma";
 import UserService from "../user.service";
 import AuthService from "../auth.service";
+import { jwt } from "../../../plugins/jwt";
 
 describe("POST /api/auth/logout", () => {
     let userService: UserService;
@@ -45,5 +46,15 @@ describe("POST /api/auth/logout", () => {
             secure: true,
             value: "",
         });
+
+        // Check that the refreshToken is actually deleted from the database
+        const refreshTokenPayload = jwt.decodeRefreshToken(refreshToken);
+        const userSession = await prisma.userSession.findUnique({
+            where: {
+                tokenFamily: refreshTokenPayload.tokenFamily,
+            },
+        });
+
+        expect(userSession).toBeNull();
     });
 });
