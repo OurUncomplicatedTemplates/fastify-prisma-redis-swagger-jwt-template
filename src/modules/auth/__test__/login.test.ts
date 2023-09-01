@@ -33,10 +33,13 @@ describe("POST /api/auth/login", () => {
         expect(response.statusCode).toBe(200);
         expect(jwt.verify(refreshToken.value)).toBeTruthy();
         expect(refreshToken).toEqual({
+            expires: expect.toBeWithinOneMinuteOf(
+                new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
+            ),
             httpOnly: true,
             name: "refreshToken",
             path: "/api/auth/refresh",
-            sameSite: "Strict",
+            sameSite: "None",
             secure: true,
             value: expect.any(String),
         });

@@ -2,19 +2,24 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import fastifyPlugin from "fastify-plugin";
 import fastifyJwt, { JWT } from "@fastify/jwt";
 
-type tokenPayload = {
+export type tokenPayload = {
+    exp: number;
+} & signTokenPayload;
+export type signTokenPayload = {
     sub: number;
     iat: number;
 };
 
-type refreshTokenPayload = {
+export type refreshTokenPayload = tokenPayload & signRefreshTokenPayload;
+export type signRefreshTokenPayload = {
     aex: number;
     tokenFamily: string;
-} & tokenPayload;
+} & signTokenPayload;
 
-type accessTokenPayload = object & tokenPayload;
+export type accessTokenPayload = tokenPayload & signAccessTokenPayload;
+export type signAccessTokenPayload = signTokenPayload;
 
-type user = {
+export type user = {
     exp: number;
 } & tokenPayload;
 
@@ -37,10 +42,17 @@ declare module "@fastify/jwt" {
     }
 
     interface JWT {
-        signRefreshToken: (refreshTokenPayload: refreshTokenPayload) => string;
+        decodeAccessToken: (refreshToken: string) => accessTokenPayload;
         decodeRefreshToken: (refreshToken: string) => refreshTokenPayload;
 
-        signAccessToken: (accessTokenPayload: accessTokenPayload) => string;
+        sign(
+            payload: signRefreshTokenPayload | signAccessTokenPayload,
+            options?: Partial<SignOptions>
+        ): string;
+        signRefreshToken: (
+            refreshTokenPayload: signRefreshTokenPayload
+        ) => string;
+        signAccessToken: (accessTokenPayload: signAccessTokenPayload) => string;
     }
 }
 
@@ -58,7 +70,9 @@ export default fastifyPlugin(
 
         jwt = fastify.jwt;
 
-        jwt.signRefreshToken = (refreshTokenPayload: refreshTokenPayload) => {
+        jwt.signRefreshToken = (
+            refreshTokenPayload: signRefreshTokenPayload
+        ) => {
             return jwt.sign(refreshTokenPayload, { expiresIn: "14d" });
         };
 
@@ -70,8 +84,16 @@ export default fastifyPlugin(
             return refreshTokenObject;
         };
 
-        jwt.signAccessToken = (accessTokenPayload: accessTokenPayload) => {
+        jwt.signAccessToken = (accessTokenPayload: signAccessTokenPayload) => {
             return jwt.sign(accessTokenPayload, { expiresIn: "10m" });
+        };
+
+        jwt.decodeAccessToken = (accessToken: string) => {
+            const accessTokenObject = jwt.decode<accessTokenPayload>(
+                accessToken
+            ) as accessTokenPayload;
+
+            return accessTokenObject;
         };
 
         fastify.decorate(

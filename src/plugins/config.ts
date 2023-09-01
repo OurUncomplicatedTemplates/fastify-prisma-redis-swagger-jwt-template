@@ -29,7 +29,12 @@ export default fastifyPlugin(
     ) => {
         const schema = {
             type: "object",
-            required: ["SECRET", "DATABASE_URL", "DATABASE_URL_NON_POOLING", "REDIS_URL"],
+            required: [
+                "SECRET",
+                "DATABASE_URL",
+                "DATABASE_URL_NON_POOLING",
+                "REDIS_URL",
+            ],
             properties: {
                 SECRET: {
                     type: "string",
