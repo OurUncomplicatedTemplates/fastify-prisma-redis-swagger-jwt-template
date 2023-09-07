@@ -8,6 +8,7 @@ import redis from "./redis";
 import swagger from "./swagger";
 import cookie from "./cookie";
 import jwt from "./jwt";
+import csrf from "./csrf";
 
 export default fastifyPlugin(async (fastify: FastifyInstance) => {
     await Promise.all([fastify.register(config), fastify.register(sensible)]);
@@ -21,5 +22,5 @@ export default fastifyPlugin(async (fastify: FastifyInstance) => {
             : /* istanbul ignore next */ null,
     ]);
 
-    await Promise.all([fastify.register(jwt)]);
+    await Promise.all([fastify.register(jwt), fastify.register(csrf)]);
 });

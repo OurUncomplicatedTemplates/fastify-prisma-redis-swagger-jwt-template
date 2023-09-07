@@ -28,13 +28,27 @@ describe("POST /api/auth/refresh", () => {
     });
 
     it("should return status 200, set a valid refreshToken and return a new valid accessToken", async () => {
-        const { refreshToken } = await authService.createTokens(user.id);
+        const { refreshToken, accessToken } = await authService.createTokens(
+            user.id
+        );
+
+        const csrfResponse = await global.fastify.inject({
+            method: "POST",
+            url: "/api/auth/csrf",
+            headers: {
+                authorization: `Bearer ${accessToken}`,
+            },
+        });
 
         const response = await global.fastify.inject({
             method: "POST",
             url: "/api/auth/refresh",
             cookies: {
                 refreshToken: refreshToken,
+                _csrf: csrfResponse.cookies[0].value,
+            },
+            payload: {
+                _csrf: csrfResponse.body,
             },
         });
 
@@ -62,14 +76,28 @@ describe("POST /api/auth/refresh", () => {
 
     it("should return status 401, when using refreshToken that has already been used", async () => {
         jest.useFakeTimers({ now: Date.now() - 1000 });
-        const { refreshToken } = await authService.createTokens(user.id);
+        const { refreshToken, accessToken } = await authService.createTokens(
+            user.id
+        );
         jest.useRealTimers();
+
+        const csrfResponse = await global.fastify.inject({
+            method: "POST",
+            url: "/api/auth/csrf",
+            headers: {
+                authorization: `Bearer ${accessToken}`,
+            },
+        });
 
         await global.fastify.inject({
             method: "POST",
             url: "/api/auth/refresh",
             cookies: {
                 refreshToken: refreshToken,
+                _csrf: csrfResponse.cookies[0].value,
+            },
+            payload: {
+                _csrf: csrfResponse.body,
             },
         });
 
@@ -80,6 +108,10 @@ describe("POST /api/auth/refresh", () => {
             url: "/api/auth/refresh",
             cookies: {
                 refreshToken: refreshToken,
+                _csrf: csrfResponse.cookies[0].value,
+            },
+            payload: {
+                _csrf: csrfResponse.body,
             },
         });
 
@@ -94,11 +126,21 @@ describe("POST /api/auth/refresh", () => {
     });
 
     it("should return status 401, refreshToken is verifiable, but not valid", async () => {
-        const { refreshToken } = await authService.createTokens(user.id);
+        const { refreshToken, accessToken } = await authService.createTokens(
+            user.id
+        );
 
         await prisma.userSession.deleteMany({
             where: {
                 refreshToken: refreshToken,
+            },
+        });
+
+        const csrfResponse = await global.fastify.inject({
+            method: "POST",
+            url: "/api/auth/csrf",
+            headers: {
+                authorization: `Bearer ${accessToken}`,
             },
         });
 
@@ -107,6 +149,10 @@ describe("POST /api/auth/refresh", () => {
             url: "/api/auth/refresh",
             cookies: {
                 refreshToken: refreshToken,
+                _csrf: csrfResponse.cookies[0].value,
+            },
+            payload: {
+                _csrf: csrfResponse.body,
             },
         });
 
@@ -128,6 +174,12 @@ describe("POST /api/auth/refresh", () => {
             tokenFamily: tokenFamily,
         });
 
+        const accessToken = jwt.signAccessToken({
+            sub: user.id,
+            iat: TimeUtil.getNowUnixTimeStamp() - 60,
+            tokenFamily: tokenFamily,
+        });
+
         await prisma.userSession.create({
             data: {
                 refreshToken: refreshToken,
@@ -136,11 +188,23 @@ describe("POST /api/auth/refresh", () => {
             },
         });
 
+        const csrfResponse = await global.fastify.inject({
+            method: "POST",
+            url: "/api/auth/csrf",
+            headers: {
+                authorization: `Bearer ${accessToken}`,
+            },
+        });
+
         const response = await global.fastify.inject({
             method: "POST",
             url: "/api/auth/refresh",
             cookies: {
                 refreshToken: refreshToken,
+                _csrf: csrfResponse.cookies[0].value,
+            },
+            payload: {
+                _csrf: csrfResponse.body,
             },
         });
 
@@ -193,16 +257,38 @@ describe("POST /api/auth/refresh", () => {
     });
 
     it("should return status 401, user does not exist", async () => {
+        const tokenFamily = v4();
+
+        const refreshToken = jwt.signRefreshToken({
+            sub: user.id,
+            iat: TimeUtil.getNowUnixTimeStamp() - 60,
+            aex: TimeUtil.getNowUnixTimeStamp() - 30,
+            tokenFamily: tokenFamily,
+        });
+
+        const accessToken = jwt.signAccessToken({
+            sub: user.id,
+            iat: TimeUtil.getNowUnixTimeStamp() - 60,
+            tokenFamily: tokenFamily,
+        });
+
+        const csrfResponse = await global.fastify.inject({
+            method: "POST",
+            url: "/api/auth/csrf",
+            headers: {
+                authorization: `Bearer ${accessToken}`,
+            },
+        });
+
         const response = await global.fastify.inject({
             method: "POST",
             url: "/api/auth/refresh",
             cookies: {
-                refreshToken: jwt.signRefreshToken({
-                    sub: 542,
-                    iat: TimeUtil.getNowUnixTimeStamp(),
-                    aex: TimeUtil.getNowUnixTimeStamp() + 60,
-                    tokenFamily: v4(),
-                }),
+                refreshToken: refreshToken,
+                _csrf: csrfResponse.cookies[0].value,
+            },
+            payload: {
+                _csrf: csrfResponse.body,
             },
         });
 

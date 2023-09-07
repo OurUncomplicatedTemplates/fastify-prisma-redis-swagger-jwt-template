@@ -124,4 +124,12 @@ export default class AuthController {
             return reply.unauthorized();
         }
     }
+
+    public async csrfHandler(request: FastifyRequest, reply: FastifyReply) {
+        const csrfToken = reply.generateCsrf({
+            userInfo: request.user.tokenFamily,
+        });
+
+        return reply.code(200).send(csrfToken);
+    }
 }

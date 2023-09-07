@@ -22,14 +22,27 @@ describe("POST /api/auth/logout", () => {
             password: "1234",
         });
 
-        const { refreshToken } = await authService.createTokens(user.id);
+        const { refreshToken, accessToken } = await authService.createTokens(
+            user.id
+        );
+
+        const csrfResponse = await global.fastify.inject({
+            method: "POST",
+            url: "/api/auth/csrf",
+            headers: {
+                authorization: `Bearer ${accessToken}`,
+            },
+        });
 
         const response = await global.fastify.inject({
             method: "POST",
             url: "/api/auth/logout",
-            payload: {},
+            payload: {
+                _csrf: csrfResponse.body,
+            },
             cookies: {
                 refreshToken: refreshToken,
+                _csrf: csrfResponse.cookies[0].value,
             },
         });
 

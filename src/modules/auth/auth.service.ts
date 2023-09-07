@@ -15,6 +15,7 @@ export default class AuthService {
         return jwt.signAccessToken({
             sub: refreshTokenObject.sub,
             iat: TimeUtil.getNowUnixTimeStamp(),
+            tokenFamily: refreshTokenObject.tokenFamily,
         });
     }
 

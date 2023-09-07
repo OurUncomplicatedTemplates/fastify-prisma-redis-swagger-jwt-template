@@ -24,9 +24,23 @@ describe("GET /api/auth/user", () => {
     it("should return status 200 and return user", async () => {
         const { accessToken } = await authService.createTokens(user.id);
 
+        const csrfResponse = await global.fastify.inject({
+            method: "POST",
+            url: "/api/auth/csrf",
+            headers: {
+                authorization: `Bearer ${accessToken}`,
+            },
+        });
+
         const response = await global.fastify.inject({
             method: "GET",
             url: "/api/auth/user",
+            payload: {
+                _csrf: csrfResponse.body,
+            },
+            cookies: {
+                _csrf: csrfResponse.cookies[0].value,
+            },
             headers: {
                 authorization: "Bearer " + accessToken,
             },
@@ -49,6 +63,7 @@ describe("GET /api/auth/user", () => {
                     jwt.signAccessToken({
                         sub: 542,
                         iat: TimeUtil.getNowUnixTimeStamp(),
+                        tokenFamily: "1234",
                     }),
             },
         });

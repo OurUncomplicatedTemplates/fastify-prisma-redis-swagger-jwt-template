@@ -5,6 +5,7 @@ import fastifyJwt, { JWT } from "@fastify/jwt";
 type tokenPayload = {
     sub: number;
     iat: number;
+    tokenFamily: string;
 };
 
 type refreshTokenPayload = {
@@ -53,6 +54,9 @@ export default fastifyPlugin(
             cookie: {
                 cookieName: "refreshToken",
                 signed: false,
+            },
+            formatUser: (payload: accessTokenPayload) => {
+                return payload as user;
             },
         });
 
