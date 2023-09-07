@@ -1,6 +1,10 @@
 import { compareSync } from "bcrypt";
 import { prisma } from "../../plugins/prisma";
-import { jwt } from "../../plugins/jwt";
+import {
+    accessTokenPayload,
+    jwt,
+    refreshTokenPayload,
+} from "../../plugins/jwt";
 import TimeUtil from "../../utils/time";
 import { v4 } from "uuid";
 
@@ -9,17 +13,28 @@ export default class AuthService {
         return compareSync(password, userPassword);
     }
 
-    private createAccessToken(oldRefreshToken: string): string {
+    private createAccessToken(oldRefreshToken: string): {
+        accessToken: string;
+        accessTokenPayload: accessTokenPayload;
+    } {
         const refreshTokenObject = jwt.decodeRefreshToken(oldRefreshToken);
 
-        return jwt.signAccessToken({
+        const accessToken = jwt.signAccessToken({
             sub: refreshTokenObject.sub,
             iat: TimeUtil.getNowUnixTimeStamp(),
             tokenFamily: refreshTokenObject.tokenFamily,
         });
+
+        return {
+            accessToken,
+            accessTokenPayload: jwt.decodeAccessToken(accessToken),
+        };
     }
 
-    private async createRefreshToken(userId: number): Promise<string> {
+    private async createRefreshToken(userId: number): Promise<{
+        refreshToken: string;
+        refreshTokenPayload: refreshTokenPayload;
+    }> {
         const tokenFamily = v4();
 
         const refreshToken = jwt.signRefreshToken({
@@ -37,12 +52,18 @@ export default class AuthService {
             },
         });
 
-        return refreshToken;
+        return {
+            refreshToken: refreshToken,
+            refreshTokenPayload: jwt.decodeRefreshToken(refreshToken),
+        };
     }
 
     private async createRefreshTokenByRefreshToken(
         oldRefreshToken: string
-    ): Promise<string> {
+    ): Promise<{
+        refreshToken: string;
+        refreshTokenPayload: refreshTokenPayload;
+    }> {
         const oldRefreshTokenObject = jwt.decodeRefreshToken(oldRefreshToken);
 
         const refreshToken = jwt.signRefreshToken({
@@ -61,24 +82,37 @@ export default class AuthService {
             },
         });
 
-        return refreshToken;
-    }
-
-    public async createTokens(
-        userId: number
-    ): Promise<{ refreshToken: string; accessToken: string }> {
-        const refreshToken = await this.createRefreshToken(userId);
-        const accessToken = this.createAccessToken(refreshToken);
-
         return {
             refreshToken: refreshToken,
-            accessToken: accessToken,
+            refreshTokenPayload: jwt.decodeRefreshToken(refreshToken),
         };
     }
 
-    public async refreshByToken(
-        oldRefreshToken: string
-    ): Promise<{ refreshToken: string; accessToken: string }> {
+    public async createTokens(userId: number): Promise<{
+        refreshToken: string;
+        refreshTokenPayload: refreshTokenPayload;
+        accessToken: string;
+        accessTokenPayload: accessTokenPayload;
+    }> {
+        const { refreshToken, refreshTokenPayload } =
+            await this.createRefreshToken(userId);
+        const { accessToken, accessTokenPayload } =
+            this.createAccessToken(refreshToken);
+
+        return {
+            refreshToken: refreshToken,
+            refreshTokenPayload: refreshTokenPayload,
+            accessToken: accessToken,
+            accessTokenPayload: accessTokenPayload,
+        };
+    }
+
+    public async refreshByToken(oldRefreshToken: string): Promise<{
+        refreshToken: string;
+        refreshTokenPayload: refreshTokenPayload;
+        accessToken: string;
+        accessTokenPayload: accessTokenPayload;
+    }> {
         jwt.verify(oldRefreshToken);
 
         const oldRefreshTokenObject = jwt.decodeRefreshToken(oldRefreshToken);
@@ -110,14 +144,24 @@ export default class AuthService {
             throw new Error("Refresh token has already been used");
         }
 
-        const refreshToken = await this.createRefreshTokenByRefreshToken(
-            oldRefreshToken
-        );
-        const accessToken = this.createAccessToken(refreshToken);
+        const { refreshToken, refreshTokenPayload } =
+            await this.createRefreshTokenByRefreshToken(oldRefreshToken);
+        const { accessToken, accessTokenPayload } =
+            this.createAccessToken(refreshToken);
 
         return {
             refreshToken: refreshToken,
+            refreshTokenPayload: refreshTokenPayload,
             accessToken: accessToken,
+            accessTokenPayload: accessTokenPayload,
         };
+    }
+
+    public async deleteUserSessionByTokenFamily(tokenFamily: string): Promise<void> {
+        await prisma.userSession.deleteMany({
+            where: {
+                tokenFamily: tokenFamily,
+            },
+        });
     }
 }

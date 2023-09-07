@@ -22,9 +22,8 @@ describe("POST /api/auth/logout", () => {
             password: "1234",
         });
 
-        const { refreshToken, accessToken } = await authService.createTokens(
-            user.id
-        );
+        const { refreshTokenPayload, accessToken } =
+            await authService.createTokens(user.id);
 
         const csrfResponse = await global.fastify.inject({
             method: "POST",
@@ -41,8 +40,10 @@ describe("POST /api/auth/logout", () => {
                 _csrf: csrfResponse.body,
             },
             cookies: {
-                refreshToken: refreshToken,
                 _csrf: csrfResponse.cookies[0].value,
+            },
+            headers: {
+                authorization: `Bearer ${accessToken}`,
             },
         });
 
@@ -54,9 +55,85 @@ describe("POST /api/auth/logout", () => {
             httpOnly: true,
             name: "refreshToken",
             path: "/api/auth/refresh",
-            sameSite: "Strict",
+            sameSite: "None",
             secure: true,
             value: "",
         });
+
+        // Check that the refreshToken is actually deleted from the database
+        const userSession = await prisma.userSession.findUnique({
+            where: {
+                tokenFamily: refreshTokenPayload.tokenFamily,
+            },
+        });
+
+        expect(userSession).toBeNull();
+    });
+
+    it("should return status 200 even if the refresh token is already deleted from the database", async () => {
+        const user = await userService.createUser({
+            name: "Joe Biden the 1st",
+            email: "joe@biden.com",
+            password: "1234",
+        });
+
+        const { refreshTokenPayload, accessToken } =
+            await authService.createTokens(user.id);
+
+        await prisma.userSession.delete({
+            where: {
+                tokenFamily: refreshTokenPayload.tokenFamily,
+            },
+        });
+
+        const csrfResponse = await global.fastify.inject({
+            method: "POST",
+            url: "/api/auth/csrf",
+            headers: {
+                authorization: `Bearer ${accessToken}`,
+            },
+        });
+
+        const response = await global.fastify.inject({
+            method: "POST",
+            url: "/api/auth/logout",
+            payload: {
+                _csrf: csrfResponse.body,
+            },
+            cookies: {
+                _csrf: csrfResponse.cookies[0].value,
+            },
+            headers: {
+                authorization: "Bearer " + accessToken,
+            },
+        });
+
+        const refreshTokenCookie: { value: string } = response.cookies[0];
+
+        expect(response.statusCode).toBe(200);
+        expect(refreshTokenCookie).toEqual({
+            expires: new Date(0),
+            httpOnly: true,
+            name: "refreshToken",
+            path: "/api/auth/refresh",
+            sameSite: "None",
+            secure: true,
+            value: "",
+        });
+    });
+
+    it("should return status 401 if no accessToken is given", async () => {
+        await userService.createUser({
+            name: "Joe Biden the 1st",
+            email: "joe@biden.com",
+            password: "1234",
+        });
+
+        const response = await global.fastify.inject({
+            method: "POST",
+            url: "/api/auth/logout",
+        });
+
+        expect(response.statusCode).toBe(401);
     });
 });

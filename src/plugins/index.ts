@@ -7,6 +7,7 @@ import prisma from "./prisma";
 import redis from "./redis";
 import swagger from "./swagger";
 import cookie from "./cookie";
+import cors from "./cors";
 import jwt from "./jwt";
 import csrf from "./csrf";
 
@@ -17,6 +18,7 @@ export default fastifyPlugin(async (fastify: FastifyInstance) => {
         fastify.register(prisma),
         fastify.register(redis),
         fastify.register(cookie),
+        fastify.register(cors),
         fastify.config.NODE_ENV === "local"
             ? /* istanbul ignore next */ fastify.register(swagger)
             : /* istanbul ignore next */ null,

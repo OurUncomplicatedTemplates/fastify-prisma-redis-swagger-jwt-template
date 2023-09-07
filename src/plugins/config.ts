@@ -16,6 +16,7 @@ declare module "fastify" {
             DATABASE_URL_NON_POOLING: string;
             REDIS_URL: string;
             NODE_ENV: NODE_ENV;
+            ALLOWED_ORIGINS: string[];
         };
     }
 }
@@ -28,7 +29,12 @@ export default fastifyPlugin(
     ) => {
         const schema = {
             type: "object",
-            required: ["SECRET", "DATABASE_URL", "DATABASE_URL_NON_POOLING", "REDIS_URL"],
+            required: [
+                "SECRET",
+                "DATABASE_URL",
+                "DATABASE_URL_NON_POOLING",
+                "REDIS_URL",
+            ],
             properties: {
                 SECRET: {
                     type: "string",
@@ -53,6 +59,11 @@ export default fastifyPlugin(
                 NODE_ENV: {
                     type: "string",
                     default: "prod",
+                },
+                ALLOWED_ORIGINS: {
+                    type: "string",
+                    separator: ",",
+                    default: "http://localhost:4321",
                 },
             },
         };
