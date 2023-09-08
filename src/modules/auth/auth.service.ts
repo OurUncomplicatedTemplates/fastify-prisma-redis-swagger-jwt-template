@@ -23,6 +23,7 @@ export default class AuthService {
             sub: refreshTokenObject.sub,
             iat: TimeUtil.getNowUnixTimeStamp(),
             tokenFamily: refreshTokenObject.tokenFamily,
+            aex: refreshTokenObject.aex,
         });
 
         return {
@@ -157,7 +158,9 @@ export default class AuthService {
         };
     }
 
-    public async deleteUserSessionByTokenFamily(tokenFamily: string): Promise<void> {
+    public async deleteUserSessionByTokenFamily(
+        tokenFamily: string
+    ): Promise<void> {
         await prisma.userSession.deleteMany({
             where: {
                 tokenFamily: tokenFamily,

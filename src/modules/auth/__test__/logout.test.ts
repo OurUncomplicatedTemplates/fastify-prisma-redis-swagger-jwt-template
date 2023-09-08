@@ -36,14 +36,12 @@ describe("POST /api/auth/logout", () => {
         const response = await global.fastify.inject({
             method: "POST",
             url: "/api/auth/logout",
-            payload: {
-                _csrf: csrfResponse.body,
-            },
             cookies: {
                 _csrf: csrfResponse.cookies[0].value,
             },
             headers: {
                 authorization: `Bearer ${accessToken}`,
+                "x-csrf-token": csrfResponse.body,
             },
         });
 
@@ -97,14 +95,12 @@ describe("POST /api/auth/logout", () => {
         const response = await global.fastify.inject({
             method: "POST",
             url: "/api/auth/logout",
-            payload: {
-                _csrf: csrfResponse.body,
-            },
             cookies: {
                 _csrf: csrfResponse.cookies[0].value,
             },
             headers: {
                 authorization: "Bearer " + accessToken,
+                "x-csrf-token": csrfResponse.body,
             },
         });
 

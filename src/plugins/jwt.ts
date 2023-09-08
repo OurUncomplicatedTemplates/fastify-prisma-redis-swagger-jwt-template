@@ -9,12 +9,11 @@ export type signTokenPayload = {
     sub: number;
     iat: number;
     tokenFamily: string;
+    aex: number;
 };
 
 export type refreshTokenPayload = tokenPayload & signRefreshTokenPayload;
-export type signRefreshTokenPayload = {
-    aex: number;
-} & signTokenPayload;
+export type signRefreshTokenPayload = signTokenPayload;
 
 export type accessTokenPayload = tokenPayload & signAccessTokenPayload;
 export type signAccessTokenPayload = signTokenPayload;

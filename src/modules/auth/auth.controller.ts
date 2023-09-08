@@ -101,7 +101,9 @@ export default class AuthController {
     }
 
     public async logoutHandler(request: FastifyRequest, reply: FastifyReply) {
-        await this.authService.deleteUserSessionByTokenFamily(request.user.tokenFamily)
+        await this.authService.deleteUserSessionByTokenFamily(
+            request.user.tokenFamily
+        );
 
         return reply
             .code(200)
@@ -132,6 +134,9 @@ export default class AuthController {
     public async csrfHandler(request: FastifyRequest, reply: FastifyReply) {
         const csrfToken = reply.generateCsrf({
             userInfo: request.user.tokenFamily,
+            sameSite: "none",
+            secure: true,
+            expires: new Date(request.user.aex * 1000),
         });
 
         return reply.code(200).send(csrfToken);

@@ -48,7 +48,7 @@ export default async (fastify: FastifyInstance) => {
                 },
                 description: "The `refreshToken` cookie is required",
             },
-            preHandler: [fastify.authenticate, fastify.csrfProtection],
+            onRequest: [fastify.authenticate, fastify.csrfProtection],
         },
         authController.refreshHandler.bind(authController)
     );
@@ -62,7 +62,7 @@ export default async (fastify: FastifyInstance) => {
                     200: $ref("logoutResponseSchema"),
                 },
             },
-            preHandler: [fastify.authenticate, fastify.csrfProtection],
+            onRequest: [fastify.authenticate, fastify.csrfProtection],
         },
         authController.logoutHandler.bind(authController)
     );
@@ -79,7 +79,7 @@ export default async (fastify: FastifyInstance) => {
                     200: $ref("userResponseSchema"),
                 },
             },
-            preHandler: [fastify.authenticate],
+            onRequest: [fastify.authenticate],
         },
         authController.userHandler.bind(authController)
     );
@@ -93,7 +93,7 @@ export default async (fastify: FastifyInstance) => {
                 },
                 tags: ["Auth"],
                 response: {
-                    //200: $ref("userResponseSchema"),
+                    200: $ref("csrfResponseSchema"),
                 },
             },
             onRequest: [fastify.authenticate],

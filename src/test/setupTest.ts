@@ -19,7 +19,19 @@ jest.mock("../plugins/prisma");
 
 beforeAll(async () => {
     expect.extend({
-        toBeWithinOneMinuteOf(got, expected) {
+        toBeWithinOneMinuteOf(got, expected: Date) {
+            if (!(got instanceof Date)) {
+                return {
+                    pass: false,
+                    message: () => {
+                        return (
+                            `${got} should be a Date object,` +
+                            `actual type: ${typeof got}`
+                        );
+                    },
+                };
+            }
+
             const oneMinute = 60 * 1000; // a minute in milliseconds
 
             const timeDiff = Math.abs(expected.getTime() - got.getTime());

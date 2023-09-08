@@ -18,10 +18,10 @@ export default fastifyPlugin(
         await fastify.register(fastifyCSRFProtection, {
             getToken: (
                 request: FastifyRequest<{
-                    Body: { _csrf: string | null | undefined } | undefined;
+                    Headers: { "x-csrf-token": string | undefined } | undefined;
                 }>
             ) => {
-                return (request.body ? request.body._csrf ?? "" : "") as string;
+                return request.headers["x-csrf-token"] as string;
             },
             getUserInfo: (request: FastifyRequest) => {
                 return request.user.tokenFamily;
@@ -30,6 +30,7 @@ export default fastifyPlugin(
                 signed: true,
                 secure: true,
                 httpOnly: false,
+                sameSite: "none",
             },
             csrfOpts: {
                 userInfo: true,

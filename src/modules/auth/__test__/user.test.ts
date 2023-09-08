@@ -35,14 +35,12 @@ describe("GET /api/auth/user", () => {
         const response = await global.fastify.inject({
             method: "GET",
             url: "/api/auth/user",
-            payload: {
-                _csrf: csrfResponse.body,
-            },
             cookies: {
                 _csrf: csrfResponse.cookies[0].value,
             },
             headers: {
                 authorization: "Bearer " + accessToken,
+                "x-csrf-token": csrfResponse.body,
             },
         });
 
@@ -64,6 +62,8 @@ describe("GET /api/auth/user", () => {
                         sub: 542,
                         iat: TimeUtil.getNowUnixTimeStamp(),
                         tokenFamily: "1234",
+                        aex:
+                            TimeUtil.getNowUnixTimeStamp() + 60 * 60 * 24 * 365,
                     }),
             },
         });

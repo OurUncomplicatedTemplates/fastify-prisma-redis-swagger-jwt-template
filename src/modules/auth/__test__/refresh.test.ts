@@ -47,8 +47,8 @@ describe("POST /api/auth/refresh", () => {
                 refreshToken: refreshToken,
                 _csrf: csrfResponse.cookies[0].value,
             },
-            payload: {
-                _csrf: csrfResponse.body,
+            headers: {
+                "x-csrf-token": csrfResponse.body,
             },
         });
 
@@ -99,8 +99,8 @@ describe("POST /api/auth/refresh", () => {
                 refreshToken: refreshToken,
                 _csrf: csrfResponse.cookies[0].value,
             },
-            payload: {
-                _csrf: csrfResponse.body,
+            headers: {
+                "x-csrf-token": csrfResponse.body,
             },
         });
 
@@ -113,8 +113,8 @@ describe("POST /api/auth/refresh", () => {
                 refreshToken: refreshToken,
                 _csrf: csrfResponse.cookies[0].value,
             },
-            payload: {
-                _csrf: csrfResponse.body,
+            headers: {
+                "x-csrf-token": csrfResponse.body,
             },
         });
 
@@ -154,8 +154,8 @@ describe("POST /api/auth/refresh", () => {
                 refreshToken: refreshToken,
                 _csrf: csrfResponse.cookies[0].value,
             },
-            payload: {
-                _csrf: csrfResponse.body,
+            headers: {
+                "x-csrf-token": csrfResponse.body,
             },
         });
 
@@ -181,6 +181,7 @@ describe("POST /api/auth/refresh", () => {
             sub: user.id,
             iat: TimeUtil.getNowUnixTimeStamp() - 60,
             tokenFamily: tokenFamily,
+            aex: TimeUtil.getNowUnixTimeStamp() - 30,
         });
 
         await prisma.userSession.create({
@@ -206,8 +207,8 @@ describe("POST /api/auth/refresh", () => {
                 refreshToken: refreshToken,
                 _csrf: csrfResponse.cookies[0].value,
             },
-            payload: {
-                _csrf: csrfResponse.body,
+            headers: {
+                "x-csrf-token": csrfResponse.body,
             },
         });
 
@@ -273,6 +274,7 @@ describe("POST /api/auth/refresh", () => {
             sub: user.id,
             iat: TimeUtil.getNowUnixTimeStamp() - 60,
             tokenFamily: tokenFamily,
+            aex: TimeUtil.getNowUnixTimeStamp() - 30,
         });
 
         const csrfResponse = await global.fastify.inject({
@@ -290,8 +292,8 @@ describe("POST /api/auth/refresh", () => {
                 refreshToken: refreshToken,
                 _csrf: csrfResponse.cookies[0].value,
             },
-            payload: {
-                _csrf: csrfResponse.body,
+            headers: {
+                "x-csrf-token": csrfResponse.body,
             },
         });
 
