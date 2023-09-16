@@ -9,6 +9,7 @@ type NODE_ENV = (typeof NODE_ENVS)[number];
 declare module "fastify" {
     interface FastifyInstance {
         config: {
+            SECRET: string;
             PRIVATE: string;
             PUBLIC: string;
             HOST: string;
@@ -31,6 +32,7 @@ export default fastifyPlugin(
         const schema = {
             type: "object",
             required: [
+                "SECRET",
                 "PRIVATE",
                 "PUBLIC",
                 "DATABASE_URL",
@@ -38,6 +40,9 @@ export default fastifyPlugin(
                 "REDIS_URL",
             ],
             properties: {
+                SECRET: {
+                    type: "string",
+                },
                 PRIVATE: {
                     type: "string",
                 },
