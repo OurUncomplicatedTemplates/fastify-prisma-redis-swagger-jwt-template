@@ -25,7 +25,7 @@ model UserSession {
     id           Int      @id @default(autoincrement())
     userId       Int
     user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-    refreshToken String   @db.VarChar(255)
+    refreshToken String   @db.VarChar(1024)
     tokenFamily  String   @db.VarChar(36)
     createdAt    DateTime @default(now())
     updatedAt    DateTime @updatedAt
