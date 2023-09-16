@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import fastifyPlugin from "fastify-plugin";
 import fastifyJwt, { JWT } from "@fastify/jwt";
+import { readFileSync } from "fs";
 
 export type tokenPayload = {
     exp: number;
@@ -61,7 +62,11 @@ export let jwt: JWT;
 export default fastifyPlugin(
     async (fastify: FastifyInstance) => {
         await fastify.register(fastifyJwt, {
-            secret: fastify.config.SECRET,
+            secret: {
+                private: fastify.config.PRIVATE,
+                public: fastify.config.PUBLIC,
+            },
+            sign: { algorithm: 'EdDSA' },
             cookie: {
                 cookieName: "refreshToken",
                 signed: false,
