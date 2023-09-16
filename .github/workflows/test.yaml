@@ -44,11 +44,11 @@ jobs:
             DATABASE_URL_WITHOUT_SCHEMA: "postgresql://postgres_user:postgres_password@localhost:5432"
             REDIS_URL: "redis://localhost"
             SECRET: "7ZB68E3HZ9HWGe8FzUvNWZcoYD9uuwkp25Y66S6RkszKadFMJCj9ShXL7TBcieG9yoRAsdTKzJcEgQUYbd6dtjXgmZMQhVNKypNeq6yKKLVht7gUtXypaoxgoRjQDHLceCWmJhM6GbwYiyLHmVYA8L9zuJUhYW2atZiv4Fxoc4YqzaCCrSZxzPBT9rFDSCtHsXXDEShMvULSStZvwt26tesWtxEMx5Q43a3s6eHrPJUPgVX3aAZsmYRu3bzCHvRp"
-            PRIVATE: >
+            PRIVATE: |
                     -----BEGIN PRIVATE KEY-----
                     MC4CAQAwBQYDK2VwBCIEIB63sfXk5HebxHMAoWavbxtK84sjVucZCNm+5Y3au6mb
                     -----END PRIVATE KEY-----
-            PUBLIC: >
+            PUBLIC: |
                     -----BEGIN PUBLIC KEY-----
                     MCowBQYDK2VwAyEA/nqSs2DZmox+sRNR9d9XdaO3C2yJABIO5gdJlBcswNI=
                     -----END PUBLIC KEY-----
