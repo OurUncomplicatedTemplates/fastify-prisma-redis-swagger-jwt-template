@@ -93,12 +93,6 @@ describe("POST /api/auth/logout", () => {
     });
 
     it("should return status 401 if no accessToken is given", async () => {
-        const user = await userService.createUser({
-            name: "Joe Biden the 1st",
-            email: "joe@biden.com",
-            password: "1234",
-        });
-
         const response = await global.fastify.inject({
             method: "POST",
             url: "/api/auth/logout",
