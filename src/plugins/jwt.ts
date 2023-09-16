@@ -1,7 +1,6 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import fastifyPlugin from "fastify-plugin";
 import fastifyJwt, { JWT } from "@fastify/jwt";
-import { readFileSync } from "fs";
 
 export type tokenPayload = {
     exp: number;
