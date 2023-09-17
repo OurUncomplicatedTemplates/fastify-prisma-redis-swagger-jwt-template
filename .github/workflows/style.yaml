@@ -10,7 +10,12 @@ jobs:
   prettier:
     runs-on: ubuntu-latest
     steps:
-      - uses: actionsx/prettier@v3
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
-            # prettier CLI arguments.
-            args: --write .
+          ref: ${{ github.head_ref }}
+
+      - name: Prettify code
+        uses: creyD/prettier_action@v4.3
+        with:
+          prettier_options: --write .
