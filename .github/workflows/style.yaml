@@ -1,0 +1,16 @@
+name: Style
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+jobs:
+  prettier:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actionsx/prettier@v3
+        with:
+            # prettier CLI arguments.
+            args: --write .
