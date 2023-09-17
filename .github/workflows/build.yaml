@@ -3,19 +3,19 @@ name: Build
 on: [push]
 
 jobs:
-    test:
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v2
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
 
-            - name: Install node
-              uses: actions/setup-node@v2
-              with:
-                  node-version: "19"
-                  cache: "npm"
+      - name: Install node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '19'
+          cache: 'npm'
 
-            - name: Install npm modules
-              run: npm install
+      - name: Install npm modules
+        run: npm install
 
-            - name: Build
-              run: npm run build
+      - name: Build
+        run: npm run build
