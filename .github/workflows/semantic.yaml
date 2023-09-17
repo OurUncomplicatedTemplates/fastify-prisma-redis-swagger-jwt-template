@@ -3,8 +3,8 @@ name: Semantic
 on: [pull_request]
 
 permissions:
-    pull-requests: "read"
+  pull-requests: 'read'
 
 jobs:
-    semantic-pull-request:
-        uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/semantic_pull_request.yml@v1
+  semantic-pull-request:
+    uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/semantic_pull_request.yml@v1
