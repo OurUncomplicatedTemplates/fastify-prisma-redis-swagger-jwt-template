@@ -9,7 +9,7 @@ export async function build() {
 		},
 	});
 
-	        await fastify.register(plugins);
+	await fastify.register(plugins);
 
 	await fastify.register(modules, { prefix: '/api' });
 
