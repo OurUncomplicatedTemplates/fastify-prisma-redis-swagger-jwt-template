@@ -24,9 +24,9 @@ declare module "fastify" {
 }
 
 export default fastifyPlugin(
-    async (
+    (
         fastify: FastifyInstance,
-        options: FastifyPluginOptions,
+        _options: FastifyPluginOptions,
         done: (err?: Error | undefined) => void
     ) => {
         const schema = {
