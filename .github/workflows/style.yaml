@@ -1,0 +1,33 @@
+name: Style
+on:
+  pull_request:
+    branches:
+      - master
+permissions:
+  checks: write
+  pull-requests: write
+  contents: write
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '19'
+          cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
+
+      - name: Install npm modules
+        run: npm ci
+
+      - name: Run Formatter
+        run: npm run format
+
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Pretty 🥰🤗🌈
+          branch: ${{ github.head_ref }}

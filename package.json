@@ -9,6 +9,7 @@
 		"vercel-build": "prisma generate && npm run build",
 		"start": "node build/src/server.js",
 		"lint": "eslint src",
+		"format": "prettier --write .",
 		"dev": "tsnd --respawn --transpile-only --exit-child src/server.ts",
 		"migrate:dev": "prisma migrate dev"
 	},
