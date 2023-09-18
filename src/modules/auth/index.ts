@@ -9,5 +9,5 @@ export default fastifyPlugin(async (fastify: FastifyInstance, options: FastifyPl
 		fastify.addSchema(schema);
 	}
 
-	        await fastify.register(authRoute, options);
+	await fastify.register(authRoute, options);
 });
