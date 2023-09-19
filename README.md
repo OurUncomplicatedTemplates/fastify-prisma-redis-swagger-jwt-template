@@ -48,6 +48,7 @@ Deploys the pending migrations to the databases.
 To learn Fastify, check out the [Fastify documentation](https://www.fastify.io/docs/latest/).
 
 ## Generate Ed25519 key pair
+
 ```bash
 openssl genpkey -algorithm ed25519 -out private.pem
 openssl pkey -in private.pem -pubout -out public.pem

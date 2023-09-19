@@ -1,95 +1,95 @@
 name: Test
 on:
-    push:
-        branches:
-            - master
-    pull_request:
-        branches:
-            - master
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 permissions:
-    checks: write
-    pull-requests: write
-    contents: write
+  checks: write
+  pull-requests: write
+  contents: write
 jobs:
-    test:
-        concurrency: ci-${{ github.ref }}
-        runs-on: ubuntu-latest
-        services:
-            # Label used to access the service container
-            postgres:
-                # Docker Hub image
-                image: postgres
-                # Provide the password for postgres
-                env:
-                    # optional (defaults to `postgres`)
-                    POSTGRES_DB: postgres_db
-                    # required
-                    POSTGRES_PASSWORD: postgres_password
-                    # optional (defaults to `5432`)
-                    POSTGRES_PORT: 5432
-                    # optional (defaults to `postgres`)
-                    POSTGRES_USER: postgres_user
-                ports:
-                    # maps tcp port 5432 on service container to the host
-                    - 5432:5432
-                # Set health checks to wait until postgres has started
-                options: >-
-                    --health-cmd pg_isready
-                    --health-interval 10s
-                    --health-timeout 5s
-                    --health-retries 5
+  test:
+    concurrency: ci-${{ github.ref }}
+    runs-on: ubuntu-latest
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres
+        # Provide the password for postgres
         env:
-            DATABASE_URL: "postgresql://postgres_user:postgres_password@localhost:5432/postgres_db"
-            DATABASE_URL_NON_POOLING: "postgresql://postgres_user:postgres_password@localhost:5432/postgres_db"
-            DATABASE_URL_WITHOUT_SCHEMA: "postgresql://postgres_user:postgres_password@localhost:5432"
-            REDIS_URL: "redis://localhost"
-            SECRET: "7ZB68E3HZ9HWGe8FzUvNWZcoYD9uuwkp25Y66S6RkszKadFMJCj9ShXL7TBcieG9yoRAsdTKzJcEgQUYbd6dtjXgmZMQhVNKypNeq6yKKLVht7gUtXypaoxgoRjQDHLceCWmJhM6GbwYiyLHmVYA8L9zuJUhYW2atZiv4Fxoc4YqzaCCrSZxzPBT9rFDSCtHsXXDEShMvULSStZvwt26tesWtxEMx5Q43a3s6eHrPJUPgVX3aAZsmYRu3bzCHvRp"
-            PRIVATE: |
-                    -----BEGIN PRIVATE KEY-----
-                    MC4CAQAwBQYDK2VwBCIEIB63sfXk5HebxHMAoWavbxtK84sjVucZCNm+5Y3au6mb
-                    -----END PRIVATE KEY-----
-            PUBLIC: |
-                    -----BEGIN PUBLIC KEY-----
-                    MCowBQYDK2VwAyEA/nqSs2DZmox+sRNR9d9XdaO3C2yJABIO5gdJlBcswNI=
-                    -----END PUBLIC KEY-----
-        steps:
-            - uses: actions/checkout@v3
+          # optional (defaults to `postgres`)
+          POSTGRES_DB: postgres_db
+          # required
+          POSTGRES_PASSWORD: postgres_password
+          # optional (defaults to `5432`)
+          POSTGRES_PORT: 5432
+          # optional (defaults to `postgres`)
+          POSTGRES_USER: postgres_user
+        ports:
+          # maps tcp port 5432 on service container to the host
+          - 5432:5432
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: 'postgresql://postgres_user:postgres_password@localhost:5432/postgres_db'
+      DATABASE_URL_NON_POOLING: 'postgresql://postgres_user:postgres_password@localhost:5432/postgres_db'
+      DATABASE_URL_WITHOUT_SCHEMA: 'postgresql://postgres_user:postgres_password@localhost:5432'
+      REDIS_URL: 'redis://localhost'
+      SECRET: '7ZB68E3HZ9HWGe8FzUvNWZcoYD9uuwkp25Y66S6RkszKadFMJCj9ShXL7TBcieG9yoRAsdTKzJcEgQUYbd6dtjXgmZMQhVNKypNeq6yKKLVht7gUtXypaoxgoRjQDHLceCWmJhM6GbwYiyLHmVYA8L9zuJUhYW2atZiv4Fxoc4YqzaCCrSZxzPBT9rFDSCtHsXXDEShMvULSStZvwt26tesWtxEMx5Q43a3s6eHrPJUPgVX3aAZsmYRu3bzCHvRp'
+      PRIVATE: |
+        -----BEGIN PRIVATE KEY-----
+        MC4CAQAwBQYDK2VwBCIEIB63sfXk5HebxHMAoWavbxtK84sjVucZCNm+5Y3au6mb
+        -----END PRIVATE KEY-----
+      PUBLIC: |
+        -----BEGIN PUBLIC KEY-----
+        MCowBQYDK2VwAyEA/nqSs2DZmox+sRNR9d9XdaO3C2yJABIO5gdJlBcswNI=
+        -----END PUBLIC KEY-----
+    steps:
+      - uses: actions/checkout@v3
 
-            - name: Setup Redis server
-              uses: supercharge/redis-github-action@1.4.0
+      - name: Setup Redis server
+        uses: supercharge/redis-github-action@1.4.0
 
-            - name: Install node
-              uses: actions/setup-node@v3
-              with:
-                  node-version: "19"
-                  cache: "npm"
-                  cache-dependency-path: "package-lock.json"
+      - name: Install node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '19'
+          cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
 
-            - name: Install npm modules
-              run: npm ci
+      - name: Install npm modules
+        run: npm ci
 
-            - name: Run prisma migrations & generate prisma client
-              run: npx prisma migrate dev
+      - name: Run prisma migrations & generate prisma client
+        run: npx prisma migrate dev
 
-            - name: Lint code
-              run: npm run lint
+      - name: Lint code
+        run: npm run lint
 
-            - name: Run tests
-              run: npm run test -- --coverage
+      - name: Run tests
+        run: npm run test -- --coverage
 
-            - name: Comment coverage report on pull request
-              if: ${{ github.event_name == 'pull_request' }}
-              uses: ArtiomTr/jest-coverage-report-action@v2
+      - name: Comment coverage report on pull request
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: ArtiomTr/jest-coverage-report-action@v2
 
-            - name: Generate coverage badge
-              if: ${{ github.ref == 'refs/heads/master' }}
-              uses: jaywcjlove/coverage-badges-cli@main
-              with:
-                  source: coverage/coverage-summary.json
-                  output: coverage/badge.svg
+      - name: Generate coverage badge
+        if: ${{ github.ref == 'refs/heads/master' }}
+        uses: jaywcjlove/coverage-badges-cli@main
+        with:
+          source: coverage/coverage-summary.json
+          output: coverage/badge.svg
 
-            - name: Publish coverage report to GitHub Pages
-              if: ${{ github.ref == 'refs/heads/master' }}
-              uses: JamesIves/github-pages-deploy-action@v4
-              with:
-                  folder: coverage
+      - name: Publish coverage report to GitHub Pages
+        if: ${{ github.ref == 'refs/heads/master' }}
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: coverage
