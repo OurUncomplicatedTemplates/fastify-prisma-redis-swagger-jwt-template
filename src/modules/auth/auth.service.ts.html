@@ -221,21 +221,8 @@
 <a name='L156'></a><a href='#L156'>156</a>
 <a name='L157'></a><a href='#L157'>157</a>
 <a name='L158'></a><a href='#L158'>158</a>
-<a name='L159'></a><a href='#L159'>159</a>
-<a name='L160'></a><a href='#L160'>160</a>
-<a name='L161'></a><a href='#L161'>161</a>
-<a name='L162'></a><a href='#L162'>162</a>
-<a name='L163'></a><a href='#L163'>163</a>
-<a name='L164'></a><a href='#L164'>164</a>
-<a name='L165'></a><a href='#L165'>165</a>
-<a name='L166'></a><a href='#L166'>166</a>
-<a name='L167'></a><a href='#L167'>167</a>
-<a name='L168'></a><a href='#L168'>168</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">7x</span>
+<a name='L159'></a><a href='#L159'>159</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">7x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">7x</span>
@@ -294,8 +281,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
@@ -315,7 +300,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -328,7 +312,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">8x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">8x</span>
@@ -378,7 +361,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
@@ -397,172 +379,163 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { compareSync } from "bcrypt";
-import { prisma } from "../../plugins/prisma";
-import {
-    accessTokenPayload,
-    jwt,
-    refreshTokenPayload,
-} from "../../plugins/jwt";
-import TimeUtil from "../../utils/time";
-import { v4 } from "uuid";
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { compareSync } from 'bcrypt';
+import { prisma } from '../../plugins/prisma';
+import { accessTokenPayload, jwt, refreshTokenPayload } from '../../plugins/jwt';
+import TimeUtil from '../../utils/time';
+import { v4 } from 'uuid';
 &nbsp;
 export default class AuthService {
-    public verifyPassword(userPassword: string, password: string): boolean {
-        return compareSync(password, userPassword);
-    }
+	public verifyPassword(userPassword: string, password: string): boolean {
+		return compareSync(password, userPassword);
+	}
 &nbsp;
-    private createAccessToken(oldRefreshToken: string): {
-        accessToken: string;
-        accessTokenPayload: accessTokenPayload;
-    } {
-        const refreshTokenObject = jwt.decodeRefreshToken(oldRefreshToken);
+	private createAccessToken(oldRefreshToken: string): {
+		accessToken: string;
+		accessTokenPayload: accessTokenPayload;
+	} {
+		const refreshTokenObject = jwt.decodeRefreshToken(oldRefreshToken);
 &nbsp;
-        const accessToken = jwt.signAccessToken({
-            sub: refreshTokenObject.sub,
-            iat: TimeUtil.getNowUnixTimeStamp(),
-            tokenFamily: refreshTokenObject.tokenFamily,
-        });
+		const accessToken = jwt.signAccessToken({
+			sub: refreshTokenObject.sub,
+			iat: TimeUtil.getNowUnixTimeStamp(),
+			tokenFamily: refreshTokenObject.tokenFamily,
+		});
 &nbsp;
-        return {
-            accessToken,
-            accessTokenPayload: jwt.decodeAccessToken(accessToken),
-        };
-    }
+		return {
+			accessToken,
+			accessTokenPayload: jwt.decodeAccessToken(accessToken),
+		};
+	}
 &nbsp;
-    private async createRefreshToken(userId: number): Promise&lt;{
-        refreshToken: string;
-        refreshTokenPayload: refreshTokenPayload;
-    }&gt; {
-        const tokenFamily = v4();
+	private async createRefreshToken(userId: number): Promise&lt;{
+		refreshToken: string;
+		refreshTokenPayload: refreshTokenPayload;
+	}&gt; {
+		const tokenFamily = v4();
 &nbsp;
-        const refreshToken = jwt.signRefreshToken({
-            sub: userId,
-            iat: TimeUtil.getNowUnixTimeStamp(),
-            aex: TimeUtil.getNowUnixTimeStamp() + 60 * 60 * 24 * 365,
-            tokenFamily: tokenFamily,
-        });
+		const refreshToken = jwt.signRefreshToken({
+			sub: userId,
+			iat: TimeUtil.getNowUnixTimeStamp(),
+			aex: TimeUtil.getNowUnixTimeStamp() + 60 * 60 * 24 * 365,
+			tokenFamily: tokenFamily,
+		});
 &nbsp;
-        await prisma.userSession.create({
-            data: {
-                refreshToken: refreshToken,
-                tokenFamily: tokenFamily,
-                userId: userId,
-            },
-        });
+		await prisma.userSession.create({
+			data: {
+				refreshToken: refreshToken,
+				tokenFamily: tokenFamily,
+				userId: userId,
+			},
+		});
 &nbsp;
-        return {
-            refreshToken: refreshToken,
-            refreshTokenPayload: jwt.decodeRefreshToken(refreshToken),
-        };
-    }
+		return {
+			refreshToken: refreshToken,
+			refreshTokenPayload: jwt.decodeRefreshToken(refreshToken),
+		};
+	}
 &nbsp;
-    private async createRefreshTokenByRefreshToken(
-        oldRefreshToken: string
-    ): Promise&lt;{
-        refreshToken: string;
-        refreshTokenPayload: refreshTokenPayload;
-    }&gt; {
-        const oldRefreshTokenObject = jwt.decodeRefreshToken(oldRefreshToken);
+	private async createRefreshTokenByRefreshToken(oldRefreshToken: string): Promise&lt;{
+		refreshToken: string;
+		refreshTokenPayload: refreshTokenPayload;
+	}&gt; {
+		const oldRefreshTokenObject = jwt.decodeRefreshToken(oldRefreshToken);
 &nbsp;
-        const refreshToken = jwt.signRefreshToken({
-            sub: oldRefreshTokenObject.sub,
-            iat: TimeUtil.getNowUnixTimeStamp(),
-            aex: oldRefreshTokenObject.aex,
-            tokenFamily: oldRefreshTokenObject.tokenFamily,
-        });
+		const refreshToken = jwt.signRefreshToken({
+			sub: oldRefreshTokenObject.sub,
+			iat: TimeUtil.getNowUnixTimeStamp(),
+			aex: oldRefreshTokenObject.aex,
+			tokenFamily: oldRefreshTokenObject.tokenFamily,
+		});
 &nbsp;
-        await prisma.userSession.update({
-            where: {
-                tokenFamily: oldRefreshTokenObject.tokenFamily,
-            },
-            data: {
-                refreshToken: refreshToken,
-            },
-        });
+		await prisma.userSession.update({
+			where: {
+				tokenFamily: oldRefreshTokenObject.tokenFamily,
+			},
+			data: {
+				refreshToken: refreshToken,
+			},
+		});
 &nbsp;
-        return {
-            refreshToken: refreshToken,
-            refreshTokenPayload: jwt.decodeRefreshToken(refreshToken),
-        };
-    }
+		return {
+			refreshToken: refreshToken,
+			refreshTokenPayload: jwt.decodeRefreshToken(refreshToken),
+		};
+	}
 &nbsp;
-    public async createTokens(userId: number): Promise&lt;{
-        refreshToken: string;
-        refreshTokenPayload: refreshTokenPayload;
-        accessToken: string;
-        accessTokenPayload: accessTokenPayload;
-    }&gt; {
-        const { refreshToken, refreshTokenPayload } =
-            await this.createRefreshToken(userId);
-        const { accessToken, accessTokenPayload } =
-            this.createAccessToken(refreshToken);
+	public async createTokens(userId: number): Promise&lt;{
+		refreshToken: string;
+		refreshTokenPayload: refreshTokenPayload;
+		accessToken: string;
+		accessTokenPayload: accessTokenPayload;
+	}&gt; {
+		const { refreshToken, refreshTokenPayload } = await this.createRefreshToken(userId);
+		const { accessToken, accessTokenPayload } = this.createAccessToken(refreshToken);
 &nbsp;
-        return {
-            refreshToken: refreshToken,
-            refreshTokenPayload: refreshTokenPayload,
-            accessToken: accessToken,
-            accessTokenPayload: accessTokenPayload,
-        };
-    }
+		return {
+			refreshToken: refreshToken,
+			refreshTokenPayload: refreshTokenPayload,
+			accessToken: accessToken,
+			accessTokenPayload: accessTokenPayload,
+		};
+	}
 &nbsp;
-    public async refreshByToken(oldRefreshToken: string): Promise&lt;{
-        refreshToken: string;
-        refreshTokenPayload: refreshTokenPayload;
-        accessToken: string;
-        accessTokenPayload: accessTokenPayload;
-    }&gt; {
-        jwt.verify(oldRefreshToken);
+	public async refreshByToken(oldRefreshToken: string): Promise&lt;{
+		refreshToken: string;
+		refreshTokenPayload: refreshTokenPayload;
+		accessToken: string;
+		accessTokenPayload: accessTokenPayload;
+	}&gt; {
+		jwt.verify(oldRefreshToken);
 &nbsp;
-        const oldRefreshTokenObject = jwt.decodeRefreshToken(oldRefreshToken);
+		const oldRefreshTokenObject = jwt.decodeRefreshToken(oldRefreshToken);
 &nbsp;
-        if (oldRefreshTokenObject.aex &lt; TimeUtil.getNowUnixTimeStamp()) {
-            await prisma.userSession.delete({
-                where: {
-                    tokenFamily: oldRefreshTokenObject.tokenFamily,
-                },
-            });
+		if (oldRefreshTokenObject.aex &lt; TimeUtil.getNowUnixTimeStamp()) {
+			await prisma.userSession.delete({
+				where: {
+					tokenFamily: oldRefreshTokenObject.tokenFamily,
+				},
+			});
 &nbsp;
-            throw new Error("Refresh token has reached absolute expiry");
-        }
+			throw new Error('Refresh token has reached absolute expiry');
+		}
 &nbsp;
-        const userSession = await prisma.userSession.findFirst({
-            where: {
-                refreshToken: oldRefreshToken,
-                userId: oldRefreshTokenObject.sub,
-            },
-        });
+		const userSession = await prisma.userSession.findFirst({
+			where: {
+				refreshToken: oldRefreshToken,
+				userId: oldRefreshTokenObject.sub,
+			},
+		});
 &nbsp;
-        if (!userSession) {
-            await prisma.userSession.delete({
-                where: {
-                    tokenFamily: oldRefreshTokenObject.tokenFamily,
-                },
-            });
+		if (!userSession) {
+			await prisma.userSession.delete({
+				where: {
+					tokenFamily: oldRefreshTokenObject.tokenFamily,
+				},
+			});
 &nbsp;
-            throw new Error("Refresh token has already been used");
-        }
+			throw new Error('Refresh token has already been used');
+		}
 &nbsp;
-        const { refreshToken, refreshTokenPayload } =
-            await this.createRefreshTokenByRefreshToken(oldRefreshToken);
-        const { accessToken, accessTokenPayload } =
-            this.createAccessToken(refreshToken);
+		const { refreshToken, refreshTokenPayload } =
+			await this.createRefreshTokenByRefreshToken(oldRefreshToken);
+		const { accessToken, accessTokenPayload } = this.createAccessToken(refreshToken);
 &nbsp;
-        return {
-            refreshToken: refreshToken,
-            refreshTokenPayload: refreshTokenPayload,
-            accessToken: accessToken,
-            accessTokenPayload: accessTokenPayload,
-        };
-    }
+		return {
+			refreshToken: refreshToken,
+			refreshTokenPayload: refreshTokenPayload,
+			accessToken: accessToken,
+			accessTokenPayload: accessTokenPayload,
+		};
+	}
 &nbsp;
-    public async deleteUserSessionByTokenFamily(tokenFamily: string): Promise&lt;void&gt; {
-        await prisma.userSession.deleteMany({
-            where: {
-                tokenFamily: tokenFamily,
-            },
-        });
-    }
+	public async deleteUserSessionByTokenFamily(tokenFamily: string): Promise&lt;void&gt; {
+		await prisma.userSession.deleteMany({
+			where: {
+				tokenFamily: tokenFamily,
+			},
+		});
+	}
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -571,7 +544,7 @@ export default class AuthService {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2023-09-16T13:39:50.313Z
+                at 2023-09-19T05:39:46.471Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

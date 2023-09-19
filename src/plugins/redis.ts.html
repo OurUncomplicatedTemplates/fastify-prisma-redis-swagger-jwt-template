@@ -137,26 +137,10 @@
 <a name='L72'></a><a href='#L72'>72</a>
 <a name='L73'></a><a href='#L73'>73</a>
 <a name='L74'></a><a href='#L74'>74</a>
-<a name='L75'></a><a href='#L75'>75</a>
-<a name='L76'></a><a href='#L76'>76</a>
-<a name='L77'></a><a href='#L77'>77</a>
-<a name='L78'></a><a href='#L78'>78</a>
-<a name='L79'></a><a href='#L79'>79</a>
-<a name='L80'></a><a href='#L80'>80</a>
-<a name='L81'></a><a href='#L81'>81</a>
-<a name='L82'></a><a href='#L82'>82</a>
-<a name='L83'></a><a href='#L83'>83</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L75'></a><a href='#L75'>75</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">7x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -227,87 +211,79 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { FastifyInstance } from "fastify";
-import fastifyPlugin from "fastify-plugin";
-import Redis from "ioredis";
-import { v4 } from "uuid";
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { FastifyInstance } from 'fastify';
+import fastifyPlugin from 'fastify-plugin';
+import Redis from 'ioredis';
+import { v4 } from 'uuid';
 &nbsp;
-declare module "fastify" {
-    interface FastifyRequest {
-        redis: Redis;
-    }
-    interface FastifyInstance {
-        redis: Redis;
-    }
+declare module 'fastify' {
+	interface FastifyRequest {
+		redis: Redis;
+	}
+	interface FastifyInstance {
+		redis: Redis;
+	}
 }
 &nbsp;
-declare module "ioredis" {
-    interface Redis {
-        remember(
-            key: string,
-            ttl: number,
-            callback: () =&gt; string | Promise&lt;string&gt;
-        ): Promise&lt;string&gt;;
-        rememberJSON&lt;T&gt;(
-            key: string,
-            ttl: number,
-            callback: () =&gt; T | Promise&lt;void | T&gt;
-        ): Promise&lt;T&gt;;
-        invalidateCaches(...keys: string[]): Promise&lt;void&gt;;
-    }
+declare module 'ioredis' {
+	interface Redis {
+		remember(key: string, ttl: number, callback: () =&gt; string | Promise&lt;string&gt;): Promise&lt;string&gt;;
+		rememberJSON&lt;T&gt;(key: string, ttl: number, callback: () =&gt; T | Promise&lt;void | T&gt;): Promise&lt;T&gt;;
+		invalidateCaches(...keys: string[]): Promise&lt;void&gt;;
+	}
 }
 &nbsp;
 export let redis: Redis;
 &nbsp;
 export default fastifyPlugin(
-    async (fastify: FastifyInstance) =&gt; {
-        redis = new Redis(fastify.config.REDIS_URL, {
-            keyPrefix:
-                fastify.config.NODE_ENV === "test"
-                    ? /* istanbul ignore next */ v4()
-                    : /* istanbul ignore next */ undefined,
-        });
+	async (fastify: FastifyInstance) =&gt; {
+		redis = new Redis(fastify.config.REDIS_URL, {
+			keyPrefix:
+				fastify.config.NODE_ENV === 'test'
+					? /* istanbul ignore next */ v4()
+					: /* istanbul ignore next */ undefined,
+		});
 &nbsp;
-        redis.remember = async (key, ttl, callback) =&gt; {
-            let value = await redis.get(key);
+		redis.remember = async (key, ttl, callback) =&gt; {
+			let value = await redis.get(key);
 &nbsp;
-            if (value !== null) {
-                return value;
-            }
+			if (value !== null) {
+				return value;
+			}
 &nbsp;
-            value = await callback();
+			value = await callback();
 &nbsp;
-            await redis.setex(key, ttl, value);
+			await redis.setex(key, ttl, value);
 &nbsp;
-            return value;
-        };
+			return value;
+		};
 &nbsp;
-        redis.rememberJSON = async (key, ttl, callback) =&gt; {
-            return JSON.parse(
-                await redis.remember(key, ttl, async () =&gt; {
-                    return JSON.stringify(await callback());
-                })
-            );
-        };
+		redis.rememberJSON = async (key, ttl, callback) =&gt; {
+			return JSON.parse(
+				await redis.remember(key, ttl, async () =&gt; {
+					return JSON.stringify(await callback());
+				}),
+			);
+		};
 &nbsp;
-        redis.invalidateCaches = async (...keys) =&gt; {
-            await Promise.all(
-                keys.map(async (key) =&gt; {
-                    await redis.del(key);
-                })
-            );
-        };
+		redis.invalidateCaches = async (...keys) =&gt; {
+			await Promise.all(
+				keys.map(async (key) =&gt; {
+					await redis.del(key);
+				}),
+			);
+		};
 &nbsp;
-        fastify.decorate("redis", redis);
-        fastify.decorateRequest("redis", {
-            getter: /* istanbul ignore next */ () =&gt; redis,
-        });
+		fastify.decorate('redis', redis);
+		fastify.decorateRequest('redis', {
+			getter: /* istanbul ignore next */ () =&gt; redis,
+		});
 &nbsp;
-        fastify.addHook("onClose", async () =&gt; {
-            redis.disconnect();
-        });
-    },
-    { dependencies: ["config"] }
+		fastify.addHook('onClose', async () =&gt; {
+			redis.disconnect();
+		});
+	},
+	{ dependencies: ['config'] },
 );
 &nbsp;</pre></td></tr></table></pre>
 
@@ -316,7 +292,7 @@ export default fastifyPlugin(
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2023-09-16T13:39:50.313Z
+                at 2023-09-19T05:39:46.471Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

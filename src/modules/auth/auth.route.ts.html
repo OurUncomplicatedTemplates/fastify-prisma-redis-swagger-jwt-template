@@ -145,10 +145,7 @@
 <a name='L80'></a><a href='#L80'>80</a>
 <a name='L81'></a><a href='#L81'>81</a>
 <a name='L82'></a><a href='#L82'>82</a>
-<a name='L83'></a><a href='#L83'>83</a>
-<a name='L84'></a><a href='#L84'>84</a>
-<a name='L85'></a><a href='#L85'>85</a>
-<a name='L86'></a><a href='#L86'>86</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L83'></a><a href='#L83'>83</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">7x</span>
@@ -156,9 +153,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">7x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -233,90 +227,87 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { FastifyInstance } from "fastify";
-import AuthController from "./auth.controller";
-import { $ref } from "./auth.schema";
-import AuthService from "./auth.service";
-import UserService from "./user.service";
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { FastifyInstance } from 'fastify';
+import AuthController from './auth.controller';
+import { $ref } from './auth.schema';
+import AuthService from './auth.service';
+import UserService from './user.service';
 &nbsp;
 export default async (fastify: FastifyInstance) =&gt; {
-    const authController = new AuthController(
-        new AuthService(),
-        new UserService()
-    );
+	const authController = new AuthController(new AuthService(), new UserService());
 &nbsp;
-    fastify.post(
-        "/register",
-        {
-            schema: {
-                tags: ["Auth"],
-                body: $ref("createUserSchema"),
-                response: {
-                    201: $ref("createUserResponseSchema"),
-                },
-            },
-        },
-        authController.registerUserHandler.bind(authController)
-    );
+	fastify.post(
+		'/register',
+		{
+			schema: {
+				tags: ['Auth'],
+				body: $ref('createUserSchema'),
+				response: {
+					201: $ref('createUserResponseSchema'),
+				},
+			},
+		},
+		authController.registerUserHandler.bind(authController),
+	);
 &nbsp;
-    fastify.post(
-        "/login",
-        {
-            schema: {
-                tags: ["Auth"],
-                body: $ref("loginSchema"),
-                response: {
-                    200: $ref("loginResponseSchema"),
-                },
-            },
-        },
-        authController.loginHandler.bind(authController)
-    );
+	fastify.post(
+		'/login',
+		{
+			schema: {
+				tags: ['Auth'],
+				body: $ref('loginSchema'),
+				response: {
+					200: $ref('loginResponseSchema'),
+				},
+			},
+		},
+		authController.loginHandler.bind(authController),
+	);
 &nbsp;
-    fastify.post(
-        "/refresh",
-        {
-            schema: {
-                tags: ["Auth"],
-                response: {
-                    200: $ref("refreshResponseSchema"),
-                },
-                description: "The `refreshToken` cookie is required",
-            },
-        },
-        authController.refreshHandler.bind(authController)
-    );
+	fastify.post(
+		'/refresh',
+		{
+			schema: {
+				tags: ['Auth'],
+				response: {
+					200: $ref('refreshResponseSchema'),
+				},
+				description: 'The `refreshToken` cookie is required',
+			},
+		},
+		authController.refreshHandler.bind(authController),
+	);
 &nbsp;
-    fastify.post(
-        "/logout",
-        {
-            schema: {
-                tags: ["Auth"],
-                response: {
-                    200: $ref("logoutResponseSchema"),
-                },
-            },
-            onRequest: [fastify.authenticate],
-        },
-        authController.logoutHandler.bind(authController)
-    );
+	fastify.post(
+		'/logout',
+		{
+			schema: {
+				tags: ['Auth'],
+				response: {
+					200: $ref('logoutResponseSchema'),
+				},
+			},
+			onRequest: [fastify.authenticate],
+		},
+		authController.logoutHandler.bind(authController),
+	);
 &nbsp;
-    fastify.get(
-        "/user",
-        {
-            schema: {
-                headers: {
-                    Authorization: true,
-                },
-                tags: ["Auth"],
-                response: {
-                    200: $ref("userResponseSchema"),
-                },
-            },
-            onRequest: [fastify.authenticate],
-        },
-        authController.userHandler.bind(authController)
-    );
+	fastify.get(
+		'/user',
+		{
+			schema: {
+				headers: {
+					Authorization: true,
+				},
+				tags: ['Auth'],
+				response: {
+					200: $ref('userResponseSchema'),
+				},
+			},
+			onRequest: [fastify.authenticate],
+		},
+		authController.userHandler.bind(authController),
+	);
 };
 &nbsp;</pre></td></tr></table></pre>
 
@@ -325,7 +316,7 @@ export default async (fastify: FastifyInstance) =&gt; {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2023-09-16T13:39:50.313Z
+                at 2023-09-19T05:39:46.471Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

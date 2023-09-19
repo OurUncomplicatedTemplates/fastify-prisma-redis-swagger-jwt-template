@@ -185,16 +185,7 @@
 <a name='L120'></a><a href='#L120'>120</a>
 <a name='L121'></a><a href='#L121'>121</a>
 <a name='L122'></a><a href='#L122'>122</a>
-<a name='L123'></a><a href='#L123'>123</a>
-<a name='L124'></a><a href='#L124'>124</a>
-<a name='L125'></a><a href='#L125'>125</a>
-<a name='L126'></a><a href='#L126'>126</a>
-<a name='L127'></a><a href='#L127'>127</a>
-<a name='L128'></a><a href='#L128'>128</a>
-<a name='L129'></a><a href='#L129'>129</a>
-<a name='L130'></a><a href='#L130'>130</a>
-<a name='L131'></a><a href='#L131'>131</a>
-<a name='L132'></a><a href='#L132'>132</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L123'></a><a href='#L123'>123</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -241,14 +232,7 @@
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -276,8 +260,6 @@
 <span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">8x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -325,136 +307,127 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { FastifyReply, FastifyRequest } from "fastify";
-import AuthService from "./auth.service";
-import UserService from "./user.service";
-import { CreateUserInput, LoginInput } from "./auth.schema";
-import { User } from "@prisma/client";
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { FastifyReply, FastifyRequest } from 'fastify';
+import AuthService from './auth.service';
+import UserService from './user.service';
+import { CreateUserInput, LoginInput } from './auth.schema';
+import { User } from '@prisma/client';
 &nbsp;
 const CACHE_TTL = 1800;
-const CACHE_KEY_USER = "user";
+const CACHE_KEY_USER = 'user';
 &nbsp;
 export default class AuthController {
-    private authService: AuthService;
-    private userService: UserService;
+	private authService: AuthService;
+	private userService: UserService;
 &nbsp;
-    constructor(authService: AuthService, userService: UserService) {
-        this.authService = authService;
-        this.userService = userService;
-    }
+	constructor(authService: AuthService, userService: UserService) {
+		this.authService = authService;
+		this.userService = userService;
+	}
 &nbsp;
-    public async registerUserHandler(
-        request: FastifyRequest&lt;{
-            Body: CreateUserInput;
-        }&gt;,
-        reply: FastifyReply
-    ) {
-        try {
-            const user = await this.userService.createUser(request.body);
+	public async registerUserHandler(
+		request: FastifyRequest&lt;{
+			Body: CreateUserInput;
+		}&gt;,
+		reply: FastifyReply,
+	) {
+		try {
+			const user = await this.userService.createUser(request.body);
 &nbsp;
-            return reply.code(201).send(user);
-        } catch (e) {
-            if (e instanceof Error) {
-                return reply.badRequest(e.message);
-            }
+			return reply.code(201).send(user);
+		} catch (e) {
+			if (e instanceof Error) {
+				return reply.badRequest(e.message);
+			}
 &nbsp;
-            /* istanbul ignore next */
-            throw e;
-        }
-    }
+			/* istanbul ignore next */
+			throw e;
+		}
+	}
 &nbsp;
-    public async loginHandler(
-        request: FastifyRequest&lt;{
-            Body: LoginInput;
-        }&gt;,
-        reply: FastifyReply
-    ) {
-        try {
-            const user = await this.userService.getUserByEmail(
-                request.body.email
-            );
+	public async loginHandler(
+		request: FastifyRequest&lt;{
+			Body: LoginInput;
+		}&gt;,
+		reply: FastifyReply,
+	) {
+		try {
+			const user = await this.userService.getUserByEmail(request.body.email);
 &nbsp;
-            if (
-                !this.authService.verifyPassword(
-                    user.password,
-                    request.body.password
-                )
-            ) {
-                throw new Error("password incorrect");
-            }
+			if (!this.authService.verifyPassword(user.password, request.body.password)) {
+				throw new Error('password incorrect');
+			}
 &nbsp;
-            const { refreshToken, refreshTokenPayload, accessToken } =
-                await this.authService.createTokens(user.id);
+			const { refreshToken, refreshTokenPayload, accessToken } =
+				await this.authService.createTokens(user.id);
 &nbsp;
-            return reply
-                .code(200)
-                .setCookie("refreshToken", refreshToken, {
-                    path: "/api/auth/refresh",
-                    secure: true,
-                    httpOnly: true,
-                    sameSite: "none",
-                    expires: new Date(refreshTokenPayload.exp * 1000),
-                })
-                .send({
-                    accessToken: accessToken,
-                });
-        } catch (e) {
-            return reply.unauthorized("email and/or password incorrect");
-        }
-    }
+			return reply
+				.code(200)
+				.setCookie('refreshToken', refreshToken, {
+					path: '/api/auth/refresh',
+					secure: true,
+					httpOnly: true,
+					sameSite: 'none',
+					expires: new Date(refreshTokenPayload.exp * 1000),
+				})
+				.send({
+					accessToken: accessToken,
+				});
+		} catch (e) {
+			return reply.unauthorized('email and/or password incorrect');
+		}
+	}
 &nbsp;
-    public async refreshHandler(request: FastifyRequest, reply: FastifyReply) {
-        try {
-            const { refreshToken, refreshTokenPayload, accessToken } =
-                await this.authService.refreshByToken(
-                    request.cookies.refreshToken as string
-                );
+	public async refreshHandler(request: FastifyRequest, reply: FastifyReply) {
+		try {
+			const { refreshToken, refreshTokenPayload, accessToken } =
+				await this.authService.refreshByToken(request.cookies.refreshToken as string);
 &nbsp;
-            return reply
-                .code(200)
-                .setCookie("refreshToken", refreshToken, {
-                    path: "/api/auth/refresh",
-                    secure: true,
-                    httpOnly: true,
-                    sameSite: "none",
-                    expires: new Date(refreshTokenPayload.exp * 1000),
-                })
-                .send({
-                    accessToken: accessToken,
-                });
-        } catch (e) {
-            return reply.unauthorized();
-        }
-    }
+			return reply
+				.code(200)
+				.setCookie('refreshToken', refreshToken, {
+					path: '/api/auth/refresh',
+					secure: true,
+					httpOnly: true,
+					sameSite: 'none',
+					expires: new Date(refreshTokenPayload.exp * 1000),
+				})
+				.send({
+					accessToken: accessToken,
+				});
+		} catch (e) {
+			return reply.unauthorized();
+		}
+	}
 &nbsp;
-    public async logoutHandler(request: FastifyRequest, reply: FastifyReply) {
-        await this.authService.deleteUserSessionByTokenFamily(request.user.tokenFamily)
+	public async logoutHandler(request: FastifyRequest, reply: FastifyReply) {
+		await this.authService.deleteUserSessionByTokenFamily(request.user.tokenFamily);
 &nbsp;
-        return reply
-            .code(200)
-            .clearCookie("refreshToken", {
-                path: "/api/auth/refresh",
-                secure: true,
-                httpOnly: true,
-                sameSite: "none",
-            })
-            .send();
-    }
+		return reply
+			.code(200)
+			.clearCookie('refreshToken', {
+				path: '/api/auth/refresh',
+				secure: true,
+				httpOnly: true,
+				sameSite: 'none',
+			})
+			.send();
+	}
 &nbsp;
-    public async userHandler(request: FastifyRequest, reply: FastifyReply) {
-        try {
-            const user = await request.redis.rememberJSON&lt;User&gt;(
-                CACHE_KEY_USER + request.user.sub,
-                CACHE_TTL,
-                async () =&gt; {
-                    return await this.userService.getUserById(request.user.sub);
-                }
-            );
-            return reply.code(200).send(user);
-        } catch (e) {
-            return reply.unauthorized();
-        }
-    }
+	public async userHandler(request: FastifyRequest, reply: FastifyReply) {
+		try {
+			const user = await request.redis.rememberJSON&lt;User&gt;(
+				CACHE_KEY_USER + request.user.sub,
+				CACHE_TTL,
+				async () =&gt; {
+					return await this.userService.getUserById(request.user.sub);
+				},
+			);
+			return reply.code(200).send(user);
+		} catch (e) {
+			return reply.unauthorized();
+		}
+	}
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -463,7 +436,7 @@ export default class AuthController {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2023-09-16T13:39:50.313Z
+                at 2023-09-19T05:39:46.471Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

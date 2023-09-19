@@ -168,13 +168,7 @@
 <a name='L103'></a><a href='#L103'>103</a>
 <a name='L104'></a><a href='#L104'>104</a>
 <a name='L105'></a><a href='#L105'>105</a>
-<a name='L106'></a><a href='#L106'>106</a>
-<a name='L107'></a><a href='#L107'>107</a>
-<a name='L108'></a><a href='#L108'>108</a>
-<a name='L109'></a><a href='#L109'>109</a>
-<a name='L110'></a><a href='#L110'>110</a>
-<a name='L111'></a><a href='#L111'>111</a>
-<a name='L112'></a><a href='#L112'>112</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L106'></a><a href='#L106'>106</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">7x</span>
@@ -275,126 +269,114 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { FastifyInstance, FastifyPluginOptions } from "fastify";
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { FastifyInstance, FastifyPluginOptions } from 'fastify';
 &nbsp;
-import fastifyEnv from "@fastify/env";
-import fastifyPlugin from "fastify-plugin";
+import fastifyEnv from '@fastify/env';
+import fastifyPlugin from 'fastify-plugin';
 &nbsp;
-const NODE_ENVS = ["prod", "test", "local"] as const;
+const NODE_ENVS = ['prod', 'test', 'local'] as const;
 type NODE_ENV = (typeof NODE_ENVS)[number];
 &nbsp;
-declare module "fastify" {
-    interface FastifyInstance {
-        config: {
-            SECRET: string;
-            PRIVATE: string;
-            PUBLIC: string;
-            HOST: string;
-            PORT: number;
-            DATABASE_URL: string;
-            DATABASE_URL_NON_POOLING: string;
-            REDIS_URL: string;
-            NODE_ENV: NODE_ENV;
-            ALLOWED_ORIGINS: string[];
-        };
-    }
+declare module 'fastify' {
+	interface FastifyInstance {
+		config: {
+			SECRET: string;
+			PRIVATE: string;
+			PUBLIC: string;
+			HOST: string;
+			PORT: number;
+			DATABASE_URL: string;
+			DATABASE_URL_NON_POOLING: string;
+			REDIS_URL: string;
+			NODE_ENV: NODE_ENV;
+			ALLOWED_ORIGINS: string[];
+		};
+	}
 }
 &nbsp;
 export default fastifyPlugin(
-    async (
-        fastify: FastifyInstance,
-        options: FastifyPluginOptions,
-        done: (err?: Error | undefined) =&gt; void
-    ) =&gt; {
-        const schema = {
-            type: "object",
-            required: [
-                "SECRET",
-                "PRIVATE",
-                "PUBLIC",
-                "DATABASE_URL",
-                "DATABASE_URL_NON_POOLING",
-                "REDIS_URL",
-            ],
-            properties: {
-                SECRET: {
-                    type: "string",
-                },
-                PRIVATE: {
-                    type: "string",
-                },
-                PUBLIC: {
-                    type: "string",
-                },
-                HOST: {
-                    type: "string",
-                    default: "0.0.0.0",
-                },
-                PORT: {
-                    type: "number",
-                    default: 3000,
-                },
-                DATABASE_URL: {
-                    type: "string",
-                },
-                DATABASE_URL_NON_POOLING: {
-                    type: "string",
-                },
-                REDIS_URL: {
-                    type: "string",
-                },
-                NODE_ENV: {
-                    type: "string",
-                    default: "prod",
-                },
-                ALLOWED_ORIGINS: {
-                    type: "string",
-                    separator: ",",
-                    default: "http://localhost:4321",
-                },
-            },
-        };
+	async (
+		fastify: FastifyInstance,
+		options: FastifyPluginOptions,
+		done: (err?: Error | undefined) =&gt; void,
+	) =&gt; {
+		const schema = {
+			type: 'object',
+			required: [
+				'SECRET',
+				'PRIVATE',
+				'PUBLIC',
+				'DATABASE_URL',
+				'DATABASE_URL_NON_POOLING',
+				'REDIS_URL',
+			],
+			properties: {
+				SECRET: {
+					type: 'string',
+				},
+				PRIVATE: {
+					type: 'string',
+				},
+				PUBLIC: {
+					type: 'string',
+				},
+				HOST: {
+					type: 'string',
+					default: '0.0.0.0',
+				},
+				PORT: {
+					type: 'number',
+					default: 3000,
+				},
+				DATABASE_URL: {
+					type: 'string',
+				},
+				DATABASE_URL_NON_POOLING: {
+					type: 'string',
+				},
+				REDIS_URL: {
+					type: 'string',
+				},
+				NODE_ENV: {
+					type: 'string',
+					default: 'prod',
+				},
+				ALLOWED_ORIGINS: {
+					type: 'string',
+					separator: ',',
+					default: 'http://localhost:4321',
+				},
+			},
+		};
 &nbsp;
-        const configOptions = {
-            // decorate the Fastify server instance with `config` key
-            // such as `fastify.config('PORT')
-            confKey: "config",
-            // schema to validate
-            schema: schema,
-            // source for the configuration data
-            data: process.env,
-            // will read .env in root folder
-            dotenv: true,
-            // will remove the additional properties
-            // from the data object which creates an
-            // explicit schema
-            removeAdditional: true,
-        };
+		const configOptions = {
+			// decorate the Fastify server instance with `config` key
+			// such as `fastify.config('PORT')
+			confKey: 'config',
+			// schema to validate
+			schema: schema,
+			// source for the configuration data
+			data: process.env,
+			// will read .env in root folder
+			dotenv: true,
+			// will remove the additional properties
+			// from the data object which creates an
+			// explicit schema
+			removeAdditional: true,
+		};
 &nbsp;
-        /* istanbul ignore next */
-        if (
-            NODE_ENVS.find(
-                (validName) =&gt; validName === process.env.NODE_ENV ?? "prod"
-            ) === undefined
-        ) {
-            throw new Error(
-                "NODE_ENV is not valid, it must be one of 'prod', 'test' or 'local'"
-            );
-        }
+		/* istanbul ignore next */
+		if (NODE_ENVS.find((validName) =&gt; validName === process.env.NODE_ENV ?? 'prod') === undefined) {
+			throw new Error("NODE_ENV is not valid, it must be one of 'prod', 'test' or 'local'");
+		}
 &nbsp;
-        fastifyEnv(fastify, configOptions, done);
-    },
-    { name: "config" }
+		fastifyEnv(fastify, configOptions, done);
+	},
+	{ name: 'config' },
 );
 &nbsp;</pre></td></tr></table></pre>
 
@@ -403,7 +385,7 @@ export default fastifyPlugin(
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2023-09-16T13:39:50.313Z
+                at 2023-09-19T05:39:46.471Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

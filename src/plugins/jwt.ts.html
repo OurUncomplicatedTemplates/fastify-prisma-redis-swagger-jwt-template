@@ -166,26 +166,9 @@
 <a name='L101'></a><a href='#L101'>101</a>
 <a name='L102'></a><a href='#L102'>102</a>
 <a name='L103'></a><a href='#L103'>103</a>
-<a name='L104'></a><a href='#L104'>104</a>
-<a name='L105'></a><a href='#L105'>105</a>
-<a name='L106'></a><a href='#L106'>106</a>
-<a name='L107'></a><a href='#L107'>107</a>
-<a name='L108'></a><a href='#L108'>108</a>
-<a name='L109'></a><a href='#L109'>109</a>
-<a name='L110'></a><a href='#L110'>110</a>
-<a name='L111'></a><a href='#L111'>111</a>
-<a name='L112'></a><a href='#L112'>112</a>
-<a name='L113'></a><a href='#L113'>113</a>
-<a name='L114'></a><a href='#L114'>114</a>
-<a name='L115'></a><a href='#L115'>115</a>
-<a name='L116'></a><a href='#L116'>116</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L104'></a><a href='#L104'>104</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">7x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -255,8 +238,6 @@
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">7x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -275,14 +256,10 @@
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">7x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -292,121 +269,108 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import fastifyPlugin from "fastify-plugin";
-import fastifyJwt, { JWT } from "@fastify/jwt";
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import fastifyPlugin from 'fastify-plugin';
+import fastifyJwt, { JWT } from '@fastify/jwt';
 &nbsp;
 export type tokenPayload = {
-    exp: number;
+	exp: number;
 } &amp; signTokenPayload;
 export type signTokenPayload = {
-    sub: number;
-    iat: number;
-    tokenFamily: string;
+	sub: number;
+	iat: number;
+	tokenFamily: string;
 };
 &nbsp;
 export type refreshTokenPayload = tokenPayload &amp; signRefreshTokenPayload;
 export type signRefreshTokenPayload = {
-    aex: number;
+	aex: number;
 } &amp; signTokenPayload;
 &nbsp;
 export type accessTokenPayload = tokenPayload &amp; signAccessTokenPayload;
 export type signAccessTokenPayload = signTokenPayload;
 &nbsp;
 export type user = {
-    exp: number;
+	exp: number;
 } &amp; tokenPayload;
 &nbsp;
-declare module "fastify" {
-    interface FastifyRequest {
-        jwt: JWT;
-    }
-    interface FastifyInstance {
-        authenticate(
-            request: FastifyRequest,
-            reply: FastifyReply
-        ): Promise&lt;void&gt;;
-    }
+declare module 'fastify' {
+	interface FastifyRequest {
+		jwt: JWT;
+	}
+	interface FastifyInstance {
+		authenticate(request: FastifyRequest, reply: FastifyReply): Promise&lt;void&gt;;
+	}
 }
 &nbsp;
-declare module "@fastify/jwt" {
-    interface FastifyJWT {
-        payload: refreshTokenPayload | accessTokenPayload;
-        user: user;
-    }
+declare module '@fastify/jwt' {
+	interface FastifyJWT {
+		payload: refreshTokenPayload | accessTokenPayload;
+		user: user;
+	}
 &nbsp;
-    interface JWT {
-        decodeAccessToken: (refreshToken: string) =&gt; accessTokenPayload;
-        decodeRefreshToken: (refreshToken: string) =&gt; refreshTokenPayload;
+	interface JWT {
+		decodeAccessToken: (refreshToken: string) =&gt; accessTokenPayload;
+		decodeRefreshToken: (refreshToken: string) =&gt; refreshTokenPayload;
 &nbsp;
-        sign(
-            payload: signRefreshTokenPayload | signAccessTokenPayload,
-            options?: Partial&lt;SignOptions&gt;
-        ): string;
-        signRefreshToken: (
-            refreshTokenPayload: signRefreshTokenPayload
-        ) =&gt; string;
-        signAccessToken: (accessTokenPayload: signAccessTokenPayload) =&gt; string;
-    }
+		sign(
+			payload: signRefreshTokenPayload | signAccessTokenPayload,
+			options?: Partial&lt;SignOptions&gt;,
+		): string;
+		signRefreshToken: (refreshTokenPayload: signRefreshTokenPayload) =&gt; string;
+		signAccessToken: (accessTokenPayload: signAccessTokenPayload) =&gt; string;
+	}
 }
 &nbsp;
 export let jwt: JWT;
 &nbsp;
 export default fastifyPlugin(
-    async (fastify: FastifyInstance) =&gt; {
-        await fastify.register(fastifyJwt, {
-            secret: {
-                private: fastify.config.PRIVATE,
-                public: fastify.config.PUBLIC,
-            },
-            sign: { algorithm: 'EdDSA' },
-            cookie: {
-                cookieName: "refreshToken",
-                signed: false,
-            },
-        });
+	async (fastify: FastifyInstance) =&gt; {
+		await fastify.register(fastifyJwt, {
+			secret: {
+				private: fastify.config.PRIVATE,
+				public: fastify.config.PUBLIC,
+			},
+			sign: { algorithm: 'EdDSA' },
+			cookie: {
+				cookieName: 'refreshToken',
+				signed: false,
+			},
+		});
 &nbsp;
-        jwt = fastify.jwt;
+		jwt = fastify.jwt;
 &nbsp;
-        jwt.signRefreshToken = (
-            refreshTokenPayload: signRefreshTokenPayload
-        ) =&gt; {
-            return jwt.sign(refreshTokenPayload, { expiresIn: "14d" });
-        };
+		jwt.signRefreshToken = (refreshTokenPayload: signRefreshTokenPayload) =&gt; {
+			return jwt.sign(refreshTokenPayload, { expiresIn: '14d' });
+		};
 &nbsp;
-        jwt.decodeRefreshToken = (refreshToken: string) =&gt; {
-            const refreshTokenObject = jwt.decode&lt;refreshTokenPayload&gt;(
-                refreshToken
-            ) as refreshTokenPayload;
+		jwt.decodeRefreshToken = (refreshToken: string) =&gt; {
+			const refreshTokenObject = jwt.decode&lt;refreshTokenPayload&gt;(
+				refreshToken,
+			) as refreshTokenPayload;
 &nbsp;
-            return refreshTokenObject;
-        };
+			return refreshTokenObject;
+		};
 &nbsp;
-        jwt.signAccessToken = (accessTokenPayload: signAccessTokenPayload) =&gt; {
-            return jwt.sign(accessTokenPayload, { expiresIn: "10m" });
-        };
+		jwt.signAccessToken = (accessTokenPayload: signAccessTokenPayload) =&gt; {
+			return jwt.sign(accessTokenPayload, { expiresIn: '10m' });
+		};
 &nbsp;
-        jwt.decodeAccessToken = (accessToken: string) =&gt; {
-            const accessTokenObject = jwt.decode&lt;accessTokenPayload&gt;(
-                accessToken
-            ) as accessTokenPayload;
+		jwt.decodeAccessToken = (accessToken: string) =&gt; {
+			const accessTokenObject = jwt.decode&lt;accessTokenPayload&gt;(accessToken) as accessTokenPayload;
 &nbsp;
-            return accessTokenObject;
-        };
+			return accessTokenObject;
+		};
 &nbsp;
-        fastify.decorate(
-            "authenticate",
-            async (request: FastifyRequest, reply: FastifyReply) =&gt; {
-                try {
-                    await request.jwtVerify();
-                } catch (e) {
-                    reply.unauthorized();
-                }
-            }
-        );
-    },
-    { dependencies: ["config", "cookie"] }
+		fastify.decorate('authenticate', async (request: FastifyRequest, reply: FastifyReply) =&gt; {
+			try {
+				await request.jwtVerify();
+			} catch (e) {
+				reply.unauthorized();
+			}
+		});
+	},
+	{ dependencies: ['config', 'cookie'] },
 );
 &nbsp;</pre></td></tr></table></pre>
 
@@ -415,7 +379,7 @@ export default fastifyPlugin(
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2023-09-16T13:39:50.313Z
+                at 2023-09-19T05:39:46.471Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
