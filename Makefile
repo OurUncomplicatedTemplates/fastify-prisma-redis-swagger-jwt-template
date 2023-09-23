@@ -1,9 +1,9 @@
 migrate-dev:
-	pnpm exec  prisma migrate dev
+	pnpm exec prisma migrate dev
 migrate-deploy:
-	pnpm exec  prisma migrate deploy
+	pnpm exec prisma migrate deploy
 migrate-reset:
-	pnpm exec  prisma migrate reset
+	pnpm exec prisma migrate reset
 prisma-generate:
 	pnpm exec prisma generate
 prod:
