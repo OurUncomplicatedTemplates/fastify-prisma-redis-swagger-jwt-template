@@ -5,9 +5,7 @@ import authRoute from './auth.route';
 import { authSchemas } from './auth.schema';
 
 export default fastifyPlugin(async (fastify: FastifyInstance, options: FastifyPluginOptions) => {
-	for (
-        const schema of authSchemas
-        ) {
+	for (const schema of authSchemas) {
 		fastify.addSchema(schema);
 	}
 
