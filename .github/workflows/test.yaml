@@ -1,8 +1,5 @@
 name: Test
 on:
-  push:
-    branches:
-      - master
   pull_request:
     branches:
       - master
@@ -14,6 +11,9 @@ jobs:
   test:
     concurrency: ci-${{ github.ref }}
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18]
     services:
       # Label used to access the service container
       postgres:
@@ -58,24 +58,28 @@ jobs:
       - name: Setup Redis server
         uses: supercharge/redis-github-action@1.4.0
 
-      - name: Install node
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Setup Node - ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
-          node-version: '19'
-          cache: 'npm'
-          cache-dependency-path: 'package-lock.json'
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
 
-      - name: Install npm modules
-        run: npm ci
+      - name: Install dependencies
+        run: pnpm install
 
       - name: Run prisma migrations & generate prisma client
-        run: npx prisma migrate dev
+        run: pnpm exec prisma migrate dev
 
       - name: Lint code
-        run: npm run lint
+        run: pnpm run lint
 
       - name: Run tests
-        run: npm run test -- --coverage
+        run: pnpm run test -- --coverage
 
       - name: Comment coverage report on pull request
         if: ${{ github.event_name == 'pull_request' }}

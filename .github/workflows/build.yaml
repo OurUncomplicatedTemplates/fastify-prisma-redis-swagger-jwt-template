@@ -1,21 +1,30 @@
 name: Build
-
-on: [push]
-
+on:
+  pull_request:
+    branches:
+      - master
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-      - name: Install node
-        uses: actions/setup-node@v2
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v2
         with:
-          node-version: '19'
-          cache: 'npm'
+          version: 8
 
-      - name: Install npm modules
-        run: npm install
+      - name: Setup Node - ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
 
-      - name: Build
-        run: npm run build
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run Build
+        run: pnpm run build
