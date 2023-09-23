@@ -29,7 +29,21 @@ export default fastifyPlugin(
 				fastify.config.NODE_ENV === 'test'
 					? /* istanbul ignore next */ v4()
 					: /* istanbul ignore next */ undefined,
-		});
+			lazyConnect: true,
+		}).on(
+			'error',
+			/* istanbul ignore next */ () => {
+				return;
+			},
+		);
+
+		await redis.connect().catch(
+			/* istanbul ignore next */ () => {
+				fastify.log.error(
+					`Can't connect to redis server at ${redis.options.host}:${redis.options.port}`,
+				);
+			},
+		);
 
 		redis.remember = async (key, ttl, callback) => {
 			let value = await redis.get(key);

@@ -7,6 +7,6 @@ module.exports = {
 	},
 	setupFilesAfterEnv: ['./src/test/setupTest.ts'],
 	collectCoverageFrom: ['./src/**', '!./src/plugins/prisma.ts', '!./src/server.ts'],
-	coverageReporters: ['json-summary', 'text', 'html'],
+	coverageReporters: ['json-summary', 'text', 'html', 'json'],
 	coveragePathIgnorePatterns: ['node_modules'],
 };
