@@ -1,17 +1,23 @@
 import { build } from './index';
 
 const start = async () => {
-	try {
-		const fastify = await build();
+	let fastify;
 
-		await fastify.listen({
-			host: fastify.config.HOST,
-			port: fastify.config.PORT,
-		});
+	const start = performance.now();
+	try {
+		fastify = await build();
 	} catch (e) {
-		console.error('start() - Unknown exception occured during startup of fastify', e);
-		process.exit(1);
+		console.error('Error occured while building fastify');
+		console.error(e);
+		return;
 	}
+
+	fastify.log.info(`Successfully built fastify instance in ${performance.now() - start} ms`);
+
+	await fastify.listen({
+		host: fastify.config.HOST,
+		port: fastify.config.PORT,
+	});
 };
 
 start();

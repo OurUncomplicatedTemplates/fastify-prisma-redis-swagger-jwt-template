@@ -9,6 +9,7 @@ permissions:
   contents: write
 jobs:
   test:
+    name: Test
     concurrency: ci-${{ github.ref }}
     runs-on: ubuntu-latest
     strategy:
