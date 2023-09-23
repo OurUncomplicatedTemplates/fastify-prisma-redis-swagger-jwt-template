@@ -26,5 +26,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Generate Prisma Client
+        run: pnpm exec prisma generate
+
       - name: Run Build
         run: pnpm run build

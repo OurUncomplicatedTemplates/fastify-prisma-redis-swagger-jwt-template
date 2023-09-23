@@ -3,8 +3,6 @@ on:
   pull_request:
     branches:
       - master
-permissions:
-  contents: write
 jobs:
   format:
     runs-on: ubuntu-latest
@@ -28,11 +26,5 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Run Formatter
-        run: pnpm run format
-
-      - name: Commit changes
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: Pretty 🥰🤗🌈
-          branch: ${{ github.head_ref }}
+      - name: Check Format
+        run: pnpm exec prettier --check .
