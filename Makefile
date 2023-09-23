@@ -14,6 +14,6 @@ dev:
 test:
 	pnpm run test
 test-coverage:
-	pnpm run test -- --coverage
+	pnpm run test --coverage
 format:
 	pnpm run format
