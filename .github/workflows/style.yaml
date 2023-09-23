@@ -3,32 +3,29 @@ on:
   pull_request:
     branches:
       - master
-permissions:
-  checks: write
-  pull-requests: write
-  contents: write
 jobs:
   format:
     name: Format
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18]
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install node
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Setup Node - ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
-          node-version: '19'
-          cache: 'npm'
-          cache-dependency-path: 'package-lock.json'
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
 
-      - name: Install npm modules
-        run: npm ci
+      - name: Install dependencies
+        run: pnpm install
 
-      - name: Run Formatter
-        run: npm run format
-
-      - name: Commit changes
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: Pretty 🥰🤗🌈
-          branch: ${{ github.head_ref }}
+      - name: Check Format
+        run: pnpm exec prettier --check .
