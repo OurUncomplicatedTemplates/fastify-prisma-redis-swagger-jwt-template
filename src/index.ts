@@ -2,20 +2,28 @@ import Fastify from 'fastify';
 import plugins from './plugins';
 import modules from './modules';
 
+const getLoggerConfig = () => {
+	switch (process.env.NODE_ENV) {
+		case 'test':
+			return false;
+		case 'local':
+			return {
+				transport: {
+					target: 'pino-pretty',
+					options: {
+						translateTime: 'HH:MM:ss Z',
+						ignore: 'pid,hostname',
+					},
+				},
+			};
+		default:
+			return true;
+	}
+};
+
 export async function build() {
 	const fastify = Fastify({
-		logger:
-			process.env.NODE_ENV === 'test'
-				? /* istanbul ignore next */ false
-				: /* istanbul ignore next */ {
-						transport: {
-							target: 'pino-pretty',
-							options: {
-								translateTime: 'HH:MM:ss Z',
-								ignore: 'pid,hostname',
-							},
-						},
-				  },
+		logger: getLoggerConfig(),
 	});
 
 	const startPlugins = performance.now();
