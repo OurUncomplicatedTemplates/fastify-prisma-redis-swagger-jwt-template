@@ -15,7 +15,7 @@ const start = async () => {
 		return;
 	}
 
-	fastify.log.info(`Successfully built fastify instance in ${performance.now() - start} ms`);
+	fastify.log.info(`Successfully built fastify instance in ${(performance.now() - start).toFixed(2)} ms`);
 
 	await fastify.listen({
 		host: fastify.config.HOST,

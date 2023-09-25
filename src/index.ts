@@ -28,11 +28,11 @@ export async function build() {
 
 	const startPlugins = performance.now();
 	await fastify.register(plugins);
-	fastify.log.info(`Plugins ${performance.now() - startPlugins} ms`);
+	fastify.log.info(`Plugins ${(performance.now() - startPlugins).toFixed(2)} ms`);
 
 	const startModules = performance.now();
 	await fastify.register(modules, { prefix: '/api' });
-	fastify.log.info(`Modules ${performance.now() - startModules} ms`);
+	fastify.log.info(`Modules ${(performance.now() - startModules).toFixed(2)} ms`);
 
 	return fastify;
 }
