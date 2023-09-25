@@ -6,6 +6,7 @@ const getLoggerConfig = () => {
 	switch (process.env.NODE_ENV) {
 		case 'test':
 			return false;
+		/* istanbul ignore next */
 		case 'local':
 			return {
 				transport: {
@@ -16,6 +17,7 @@ const getLoggerConfig = () => {
 					},
 				},
 			};
+		/* istanbul ignore next */
 		default:
 			return true;
 	}
